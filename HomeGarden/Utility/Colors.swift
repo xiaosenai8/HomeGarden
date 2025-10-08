@@ -1,5 +1,5 @@
 //
-//  Color.swift
+//  Colors.swift
 //  HomeGarden
 //  
 //  Created by konishi on 2025/10/08
@@ -7,42 +7,37 @@
 //
 
 import Foundation
+import SwiftUI
 
-enum Color: Int,Codable,CaseIterable,Identifiable{
+enum Colors: Int,Codable,CaseIterable,Identifiable{
     var id: Int{
         rawValue
     }
-
-        case red
-        case green
-        case blue
     
+    case teal      = 1
+    case green     = 2
+    case red       = 3
+    case brown     = 4
+    case orange    = 5
+    case yellow    = 6
 }
 
-extension Color{
-    var name: String{
+extension Colors{
+    var colorType: Color{
         switch self {
-            
-        case .red:
-            "赤"
-        case .green:
-            "緑"
-        case .blue:
-            "青"
-        }
-    }
-}
 
-extension Color{
-    var colorType: String{
-        switch self {
-            
-        case .red:
-            "sun.min"
+        case .teal:
+            .teal
         case .green:
-            "moon"
-        case .blue:
-            "cloud"
+            .green
+        case .red:
+            .red
+        case .brown:
+            .brown
+        case .orange:
+            .orange
+        case .yellow:
+            .yellow
         }
     }
 }
