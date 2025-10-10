@@ -8,15 +8,27 @@
 import SwiftUI
 import SwiftData
 
+//==================================================//
+//  MARK: - コンテンツ画面
+//==================================================//
+
 struct ContentView: View {
     
     var body: some View {
         
+        //==================================================//
+        //  MARK: - タブ
+        //==================================================//
+        
         TabView {
+            
+            // 一覧画面
             ListCropView()
                 .tabItem {
                     Label("一覧", systemImage: "list.bullet")
                 }
+            
+            // 設定画面
             SettingView()
                 .tabItem {
                     Text("設定")

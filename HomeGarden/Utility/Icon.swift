@@ -24,11 +24,11 @@ extension Icon{
         switch self {
             
         case .tomato:
-            "トマト"
+            return "トマト"
         case .eggplant:
-            "ナス"
+            return "ナス"
         case .cucumber:
-            "きゅうり"
+            return "きゅうり"
         }
     }
 }
@@ -38,11 +38,11 @@ extension Icon{
         switch self {
             
         case .tomato:
-            "sun.min"
+            return "sun.min"
         case .eggplant:
-            "moon"
+            return "moon"
         case .cucumber:
-            "cloud"
+            return "cloud"
         }
     }
 }

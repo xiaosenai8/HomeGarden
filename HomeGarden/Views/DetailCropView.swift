@@ -9,6 +9,11 @@
 import SwiftUI
 import SwiftData
 
+
+//==================================================//
+//  MARK: - 詳細画面
+//==================================================//
+
 struct DetailCropView: View {
     
     @Environment(\.dismiss) var dismiss
@@ -24,7 +29,3 @@ struct DetailCropView: View {
         }
     }
 }
-
-//#Preview {
-//    DetailCropView()
-//}
