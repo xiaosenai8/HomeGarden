@@ -1,5 +1,5 @@
 //
-//  Icon.swift
+//  CropIcon.swift
 //  HomeGarden
 //  
 //  Created by konishi on 2025/10/07
@@ -7,8 +7,12 @@
 //
 
 import Foundation
+import SwiftUI
 
-enum Icon: Int,Codable,CaseIterable,Identifiable{
+//==================================================//
+//  MARK: - 構造体
+//==================================================//
+enum CropIcon: Int,Codable,CaseIterable,Identifiable{
     var id: Int{
         rawValue
     }
@@ -19,30 +23,30 @@ enum Icon: Int,Codable,CaseIterable,Identifiable{
 
 }
 
-extension Icon{
-    var name: String{
+extension CropIcon{
+    var CropIconName: String{
         switch self {
             
         case .tomato:
-            return "トマト"
+            "トマト"
         case .eggplant:
-            return "ナス"
+            "ナス"
         case .cucumber:
-            return "きゅうり"
+            "きゅうり"
         }
     }
 }
 
-extension Icon{
-    var iconType: String{
+extension CropIcon{
+    var cropIcon: String{
         switch self {
             
         case .tomato:
-            return "sun.min"
+            "sun.min"
         case .eggplant:
-            return "moon"
+            "moon"
         case .cucumber:
-            return "cloud"
+            "cloud"
         }
     }
 }

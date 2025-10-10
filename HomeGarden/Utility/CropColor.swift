@@ -1,5 +1,5 @@
 //
-//  Colors.swift
+//  CropColor.swift
 //  HomeGarden
 //  
 //  Created by konishi on 2025/10/08
@@ -9,7 +9,10 @@
 import Foundation
 import SwiftUI
 
-enum Colors: Int,Codable,CaseIterable,Identifiable{
+//==================================================//
+//  MARK: - 構造体
+//==================================================//
+enum CropColor: Int,Codable,CaseIterable,Identifiable{
     var id: Int{
         rawValue
     }
@@ -22,8 +25,8 @@ enum Colors: Int,Codable,CaseIterable,Identifiable{
     case yellow    = 6
 }
 
-extension Colors{
-    var colorType: Color{
+extension CropColor{
+    var cropColor: Color{
         switch self {
 
         case .teal:

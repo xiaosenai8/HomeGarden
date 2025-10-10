@@ -23,8 +23,8 @@ struct NewCropFormView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var name: String = ""
-    @State private var selsctedIcon: Icon = .tomato
-    @State private var selsctedColor: Colors = .teal
+    @State private var selsctedCropIcon: CropIcon = .tomato
+    @State private var selectedCropColor: CropColor = .teal
     
     //==================================================//
     //  MARK: - データ追加
@@ -40,8 +40,7 @@ struct NewCropFormView: View {
         let newOrderIndex = (crops.map { $0.orderIndex }.max() ?? -1) + 1
         
         // 新しい Crop を作成し、決めた orderIndex をセット
-        // TODO: アイコンと色を追加
-        let newCrop = Crop(orderIndex: newOrderIndex, name: name)
+        let newCrop = Crop(orderIndex: newOrderIndex, name: name, icon: selsctedCropIcon, color: selectedCropColor)
         
         // モデルコンテキストに挿入（保存待ち状態になる）
         modelContext.insert(newCrop)
@@ -52,7 +51,7 @@ struct NewCropFormView: View {
         // モーダルや画面を閉じる
         dismiss()
     }
-
+    
     //==================================================//
     //  MARK: - 追加画面表示
     //==================================================//
@@ -73,65 +72,65 @@ struct NewCropFormView: View {
                 
                 Section {
                     // アイコン
-                    Picker("アイコン", selection: $selsctedIcon){
-                        ForEach(Icon.allCases){icon in
+                    Picker("アイコン", selection: $selsctedCropIcon){
+                        ForEach(CropIcon.allCases){icon in
                             HStack{
-                                Image(systemName: icon.iconType)
-                                Text(icon.name)
+                                Image(systemName: icon.cropIcon)
+                                Text(icon.CropIconName)
                             }
                             .tag(icon)
                         }
                     }
-                    
-                    // 色
-                    Picker("カラー", selection: $selsctedColor){
-                        ForEach(Colors.allCases){color in
-                            Image(systemName: "circle.fill")
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(color.colorType)
-                                .tag(color)
+                        
+                        // 色
+                        Picker("カラー", selection: $selectedCropColor){
+                            ForEach(CropColor.allCases){color in
+                                Image(systemName: "circle.fill")
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(color.cropColor)
+                                    .tag(color)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        
+                    } header: {
+                        Text("カスタマイズ")
                     }
-                    .pickerStyle(.segmented)
-                    
-                } header: {
-                    Text("カスタマイズ")
                 }
-            }
-            .navigationTitle("野菜の追加")
-        }
-        
-        // 保存
-        Button{
-            // 名前が入力されている場合のみアクティブにする
-            if name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty{
-                return
-            }else{
-                addNewCrop()
-                dismiss()
+                .navigationTitle("野菜の追加")
             }
             
-        }label: {
-            Text("追加")
-                .font(.title2.weight(.medium))
-                .frame(maxWidth: .infinity)
+            // 保存
+            Button{
+                // 名前が入力されている場合のみアクティブにする
+                if name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty{
+                    return
+                }else{
+                    addNewCrop()
+                    dismiss()
+                }
+                
+            }label: {
+                Text("追加")
+                    .font(.title2.weight(.medium))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.extraLarge)
+            .buttonBorderShape(.roundedRectangle)
+            .disabled(name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            
+            // キャンセル
+            Button{
+                dismiss()
+            }label: {
+                Text("キャンセル")
+                    .frame(maxWidth: .infinity)
+            }
+            
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.extraLarge)
-        .buttonBorderShape(.roundedRectangle)
-        .disabled(name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-        
-        // キャンセル
-        Button{
-            dismiss()
-        }label: {
-            Text("キャンセル")
-                .frame(maxWidth: .infinity)
-        }
-        
     }
-}
-
-#Preview {
-    NewCropFormView()
-}
+    
+    #Preview {
+        NewCropFormView()
+    }

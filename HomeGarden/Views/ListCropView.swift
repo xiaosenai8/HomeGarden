@@ -183,11 +183,10 @@ private struct CropRowView: View {
     var body: some View {
         HStack {
 
-// TODO: アイコン追加
-//            Image(systemName: crop.icon.iconType)
-//                .foregroundColor(crop.colors.colorType)
-//                .padding(16)
-//                .font(.system(size: 24, weight: .semibold))
+            Image(systemName: crop.icon.cropIcon)
+                .foregroundColor(crop.color.cropColor)
+                .padding(16)
+                .font(.system(size: 24, weight: .semibold))
             
             Text(crop.name)
                 .font(.headline.weight(.semibold))
@@ -195,12 +194,11 @@ private struct CropRowView: View {
             
             Spacer()
             
-// TODO: 自作の chevron（編集モード時は非表示）
-//            Image(systemName: "chevron.right")
-//                .opacity(isEditMode ? 0 : 1)
-//                .foregroundColor(crop.colors.colorType)
-//                .font(.system(size: 14, weight: .medium))
-//                .padding(16)
+            Image(systemName: "chevron.right")
+                .opacity(isEditMode ? 0 : 1)
+                .foregroundColor(crop.color.cropColor)
+                .font(.system(size: 14, weight: .medium))
+                .padding(16)
         }
         .frame(height: 60)
         .background(Color.gray.opacity(0.1))

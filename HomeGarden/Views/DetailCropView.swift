@@ -17,15 +17,52 @@ import SwiftData
 struct DetailCropView: View {
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.modelContext) var modelContext
+    let crop: Crop
     
-    var crop: Crop
+    @Query private var activities: [Activity]
+    
+    @State private var isAddingActivity = false
+    
+    init(crop: Crop) {
+        self.crop = crop
+    }
     
     var body: some View {
-        ZStack {
-            Text("\(crop.name)")
-            Button("閉じる") {
-                dismiss()
+        VStack {
+            Text(crop.name)
+                .font(.largeTitle.bold())
+            
+            List {
+                ForEach(activities) { activity in
+                    HStack {
+                        Text(activity.type.displayName)
+                        Spacer()
+                        if let q = activity.quantity {
+                            Text("\(q)")
+                        }
+                        Text(activity.date, style: .date)
+                            .foregroundColor(.gray)
+                            .font(.caption)
+                    }
+                }
+                .onDelete(perform: deleteActivity)
+            }
+            
+            Button("作業追加") {
+                isAddingActivity = true
+            }
+            .sheet(isPresented: $isAddingActivity) {
+                NewActivityFormView(crop: crop)
             }
         }
+        .padding()
+    }
+    
+    private func deleteActivity(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(activities[index])
+        }
+        try? modelContext.save()
     }
 }
