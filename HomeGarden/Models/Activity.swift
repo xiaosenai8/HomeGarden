@@ -11,19 +11,14 @@ import SwiftData
 
 @Model
 class Activity: Identifiable {
-    @Attribute var id: UUID = UUID()
     @Attribute var date: Date
     @Attribute var type: ActivityType
     @Attribute var quantity: Int?
-    
-//    @Relationship(inverse: \Crop.activities)
-//    var crop: Crop
     
     init(date: Date = Date(), type: ActivityType, quantity: Int? = nil, crop: Crop) {
         self.date = date
         self.type = type
         self.quantity = quantity
-//        self.crop = crop
     }
 }
 

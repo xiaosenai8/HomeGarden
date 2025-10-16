@@ -1,5 +1,5 @@
 //
-//  NewCropFormView.swift
+//  FormCropView.swift
 //  HomeGarden
 //
 //  Created by konishi on 2025/10/05
@@ -13,7 +13,7 @@ import SwiftData
 //  MARK: - 追加画面
 //==================================================//
 
-struct NewCropFormView: View {
+struct FormCropView: View {
     
     //==================================================//
     //  MARK: - 変数
@@ -132,5 +132,5 @@ struct NewCropFormView: View {
     }
     
     #Preview {
-        NewCropFormView()
+        FormCropView()
     }

@@ -17,21 +17,23 @@ struct ListCropView: View {
     //==================================================//
     //  MARK: - 変数
     //==================================================//
-
-    @Environment(\.modelContext) var modelContext
-    @Query(sort: [SortDescriptor(\Crop.orderIndex)]) private var crops: [Crop]
     
+    @Environment(\.modelContext) var modelContext
+    @Query(
+        filter: #Predicate<Crop> { !$0.isArchived },
+        sort: [SortDescriptor(\Crop.orderIndex)]
+    )
+    
+    private var crops: [Crop]
     @State private var isSheetPresented = false
     @State private var isEditMode = false
     @State private var selectedCrop: Crop?
     
     //==================================================//
-    //  MARK: - 一覧画面表示
+    //  MARK: - ビュー
     //==================================================//
     
     var body: some View {
-        
-        // ナビゲーション
         NavigationStack {
             VStack {
                 
@@ -41,28 +43,37 @@ struct ListCropView: View {
                 // リスト
                 List {
                     ForEach(crops) { crop in
-                        
-                        //　詳細画面表示ボタン
                         Button {
-                            
-                            // エディットモードの時は抜ける
                             guard !isEditMode else { return }
-                            
-                            // 選択した作物を格納
                             selectedCrop = crop
-                            
                         } label: {
-                            
-                            // 行の表示
                             CropRowView(isEditMode: $isEditMode, crop: crop)
                         }
                         .buttonStyle(.plain)
                         .contentShape(Rectangle())
-                        .listRowInsets(.init(top: 10, leading: 20, bottom: 20, trailing: 10))
+                        .listRowInsets(.init(top: 10, leading: 20, bottom: 10, trailing: 10))
                         .listRowSeparator(.hidden)
                         .cornerRadius(10)
+                        
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button {
+                                // TODO:
+                            } label: {
+                                Label("編集", systemImage: "pencil")
+                            }
+                            .tint(.teal)
+                        }
+                        
+                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                            Button {
+                                archiveCrop(crop)
+                            } label: {
+                                Label("アーカイブ", systemImage: "archivebox")
+                            }
+                            .tint(.gray)
+                        }
+
                     }
-                    // 編集モードの設定
                     .onDelete(perform: deleteCrop)
                     .onMove(perform: moveCrop)
                 }
@@ -72,68 +83,53 @@ struct ListCropView: View {
                 .environment(\.editMode, .constant(isEditMode ? .active : .inactive))
             }
             .sheet(isPresented: $isSheetPresented) {
-                
-                // 追加画面の表示
-                NewCropFormView()
+                FormCropView()
             }
-            
             .navigationDestination(isPresented: Binding(
-                
-                // 詳細画面の表示
                 get: { selectedCrop != nil },
                 set: { newValue in
                     if !newValue { selectedCrop = nil }
                 })
             ) {
                 if let crop = selectedCrop {
-                    DetailCropView(crop: crop)
+                    ListActivityView(crop: crop)
                 }
             }
         }
     }
-
+    
     //==================================================//
-    //  MARK: - リスト削除
+    //  MARK: - リスト操作
     //==================================================//
     
     private func deleteCrop(at offsets: IndexSet) {
         for index in offsets { modelContext.delete(crops[index]) }
         try? modelContext.save()
     }
-
-    //==================================================//
-    //  MARK: - リスト並び替え
-    //==================================================//
+    
     private func moveCrop(from source: IndexSet, to destination: Int) {
-        // crops は @Query で取得される配列
         var currentCrops = crops.sorted(by: { $0.orderIndex < $1.orderIndex })
-        
-        // 配列の並べ替え
         currentCrops.move(fromOffsets: source, toOffset: destination)
-        
-        // 新しい順序で orderIndex を更新
         for (index, crop) in currentCrops.enumerated() {
             crop.orderIndex = index
         }
-        
-        // 保存
+        try? modelContext.save()
+    }
+    
+    private func archiveCrop(_ crop: Crop) {
+        crop.isArchived = true
         try? modelContext.save()
     }
 }
 
-
 //==================================================//
-//  MARK: - リスト表示
+//  MARK: - ヘッダー
 //==================================================//
 
 private struct HeaderView: View {
-    
     @Binding var isSheetPresented: Bool
     @Binding var isEditMode: Bool
     
-    //==================================================//
-    //  MARK: - ビューの設定
-    //==================================================//
     var body: some View {
         HStack {
             Text("家庭菜園")
@@ -142,7 +138,6 @@ private struct HeaderView: View {
             Spacer()
             
             HStack(spacing: 12) {
-                // ＋ ボタン：追加
                 Button {
                     isSheetPresented = true
                 } label: {
@@ -152,13 +147,10 @@ private struct HeaderView: View {
                         .font(.system(size: 20, weight: .semibold))
                 }
                 
-                // ボタン：編集モード切替
                 Button {
-                    withAnimation {
-                        isEditMode.toggle()
-                    }
+                    withAnimation { isEditMode.toggle() }
                 } label: {
-                    Image(systemName: "pencil")
+                    Image(systemName: "line.3.horizontal")
                         .symbolRenderingMode(.palette)
                         .foregroundStyle(isEditMode ? .orange : .teal)
                         .font(.system(size: 20, weight: .semibold))
@@ -170,19 +162,15 @@ private struct HeaderView: View {
 }
 
 //==================================================//
-//  MARK: - ヘッダー
+//  MARK: - リスト行
 //==================================================//
 
 private struct CropRowView: View {
     @Binding var isEditMode: Bool
     let crop: Crop
-
-    //==================================================//
-    //  MARK: - ビューの設定
-    //==================================================//
+    
     var body: some View {
         HStack {
-
             Image(systemName: crop.icon.cropIcon)
                 .foregroundColor(crop.color.cropColor)
                 .padding(16)
@@ -214,5 +202,4 @@ private struct CropRowView: View {
     ListCropView()
         .modelContainer(Crop.preview)
 }
-
 

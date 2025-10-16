@@ -1,5 +1,5 @@
 //
-//  NewActivityFormView.swift
+//  FormActivityView.swift
 //  HomeGarden
 //  
 //  Created by konishi on 2025/10/10
@@ -9,7 +9,7 @@
 import SwiftUI
 import SwiftData
 
-struct NewActivityFormView: View {
+struct FormActivityView: View {
         
         @Environment(\.modelContext) var modelContext
         @Environment(\.dismiss) var dismiss

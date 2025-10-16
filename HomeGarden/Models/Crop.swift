@@ -34,6 +34,10 @@ class Crop{
     // 実際に保存する値はInt
     var iconValue: Int = CropIcon.tomato.rawValue
     var colorValue: Int = CropColor.teal.rawValue
+    
+    @Relationship var activities: [Activity] = []
+    
+    var isArchived: Bool = false
 
     
     //==================================================//
@@ -51,12 +55,6 @@ extension Crop{
     @MainActor
     static var preview: ModelContainer{
         let container = try! ModelContainer(for: Crop.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-        
-//        container.mainContext.insert(Crop(orderIndex: 1,name: "トマト"))
-//        container.mainContext.insert(Crop(orderIndex: 2,name: "なす"))
-//        container.mainContext.insert(Crop(orderIndex: 3,name: "ピーマン"))
-//        container.mainContext.insert(Crop(orderIndex: 4,name: "いちご"))
-//        container.mainContext.insert(Crop(orderIndex: 5,name: "にんにく"))
         
         container.mainContext.insert(Crop(orderIndex: 1,name: "トマト", icon: .tomato, color: .red))
         container.mainContext.insert(Crop(orderIndex: 2,name: "なす", icon: .cucumber, color: .teal))
