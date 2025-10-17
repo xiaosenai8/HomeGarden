@@ -1,21 +1,30 @@
-//
-//  CropColor.swift
-//  HomeGarden
-//  
-//  Created by konishi on 2025/10/08
-//  
-//
+//==================================================//
+//  MARK: - CropColor.swift
+//  作成者: konishi
+//  作成日: 2025/10/17
+//  説明  : 作物の色を管理する列挙型
+//==================================================//
 
 import Foundation
 import SwiftUI
 
 //==================================================//
-//  MARK: - 構造体
+//  MARK: - 列挙型
 //==================================================//
-enum CropColor: Int,Codable,CaseIterable,Identifiable{
-    var id: Int{
-        rawValue
-    }
+
+/// 作物のカラーを管理する列挙型
+/// - Note: 保存は Int 値として行う
+enum CropColor: Int, Codable, CaseIterable, Identifiable {
+    
+    //==================================================//
+    //  MARK: - Identifiable
+    //==================================================//
+    
+    var id: Int { rawValue }
+    
+    //==================================================//
+    //  MARK: - ケース
+    //==================================================//
     
     case teal      = 1
     case green     = 2
@@ -25,22 +34,22 @@ enum CropColor: Int,Codable,CaseIterable,Identifiable{
     case yellow    = 6
 }
 
-extension CropColor{
-    var cropColor: Color{
-        switch self {
+//==================================================//
+//  MARK: - 拡張: SwiftUI Color
+//==================================================//
 
-        case .teal:
-            .teal
-        case .green:
-            .green
-        case .red:
-            .red
-        case .brown:
-            .brown
-        case .orange:
-            .orange
-        case .yellow:
-            .yellow
+extension CropColor {
+    
+    /// SwiftUI の Color に変換
+    var cropColor: Color {
+        switch self {
+        case .teal:   return .teal
+        case .green:  return .green
+        case .red:    return .red
+        case .brown:  return .brown
+        case .orange: return .orange
+        case .yellow: return .yellow
         }
     }
 }
+

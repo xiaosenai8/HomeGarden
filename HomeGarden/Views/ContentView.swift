@@ -1,9 +1,9 @@
-//
-//  ContentView.swift
-//  Watchlist
-//
-//  Created by 小森愛 on 2025/10/04.
-//
+//==================================================//
+//  MARK: - ContentView.swift
+//  作成者: konishi
+//  作成日: 2025/10/17
+//  説明  : アプリのメインコンテンツ画面。タブで一覧画面と設定画面を切り替え
+//==================================================//
 
 import SwiftUI
 import SwiftData
@@ -14,30 +14,41 @@ import SwiftData
 
 struct ContentView: View {
     
+    //==================================================//
+    //  MARK: - Body
+    //==================================================//
+    
     var body: some View {
         
         //==================================================//
-        //  MARK: - タブ
+        //  MARK: - タブビュー
         //==================================================//
         
         TabView {
             
-            // 一覧画面
+            //==================================================//
+            //  MARK: - 家庭菜園一覧タブ
+            //==================================================//
             ListCropView()
                 .tabItem {
                     Label("一覧", systemImage: "list.bullet")
                 }
             
-            // 設定画面
+            //==================================================//
+            //  MARK: - 設定タブ
+            //==================================================//
             SettingView()
                 .tabItem {
-                    Text("設定")
-                    Image(systemName: "gearshape")
+                    Label("設定", systemImage: "gearshape")
                 }
         }
-        .accentColor(.teal)
+        .accentColor(.teal) // タブ選択時のテーマカラー
     }
 }
+
+//==================================================//
+//  MARK: - Preview
+//==================================================//
 
 #Preview("Sample List") {
     ContentView()
@@ -48,3 +59,4 @@ struct ContentView: View {
     ContentView()
         .modelContainer(for: Crop.self, inMemory: true)
 }
+

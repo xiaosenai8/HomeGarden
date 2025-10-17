@@ -1,104 +1,64 @@
-//
-//  FormCropView.swift
-//  HomeGarden
-//
-//  Created by konishi on 2025/10/05
-//
-//
+//==================================================//
+//  MARK: - FormCropView.swift
+//  作成者: konishi
+//  作成日: 2025/10/05
+//  説明  : 作物（Crop）の追加・編集・削除を行うフォーム画面
+//==================================================//
 
 import SwiftUI
 import SwiftData
 
 //==================================================//
-//  MARK: - 追加画面
+//  MARK: - 作物フォームビュー
 //==================================================//
-
 struct FormCropView: View {
     
     //==================================================//
-    //  MARK: - 変数
+    //  MARK: - Environment
     //==================================================//
-    
-    @Environment(\.modelContext) var modelContext
-    @Environment(\.dismiss) var dismiss
-    
-    var editingCrop: Crop?
-    
-    @State private var name: String = ""
-    @State private var selectedCropIcon: CropIcon = .tomato
-    @State private var selectedCropColor: CropColor = .teal
-    @State private var showDeleteAlert = false
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     
     //==================================================//
-    //  MARK: - データ保存
+    //  MARK: - 入力データ
     //==================================================//
-    private func saveCrop() {
-        if let editingCrop = editingCrop {
-            // 編集モード
-            editingCrop.name = name
-            editingCrop.icon = selectedCropIcon
-            editingCrop.color = selectedCropColor
-        } else {
-            // 新規作成モード
-            let descriptor = FetchDescriptor<Crop>(sortBy: [SortDescriptor(\.orderIndex)])
-            let crops = (try? modelContext.fetch(descriptor)) ?? []
-            let newOrderIndex = (crops.map { $0.orderIndex }.max() ?? -1) + 1
-            
-            let newCrop = Crop(
-                orderIndex: newOrderIndex,
-                name: name,
-                icon: selectedCropIcon,
-                color: selectedCropColor
-            )
-            modelContext.insert(newCrop)
-        }
-        
-        try? modelContext.save()
-        dismiss()
-    }
+    var editingCrop: Crop?   // 編集対象のCrop
+    
+    @State private var cropName: String = ""                      // 野菜の名前
+    @State private var selectedIcon: CropIcon = .tomato           // アイコン選択
+    @State private var selectedColor: CropColor = .teal           // カラー選択
+    @State private var showDeleteAlert: Bool = false             // 削除アラート表示
     
     //==================================================//
-    //  MARK: - データ削除
-    //==================================================//
-    private func deleteCrop(_ crop: Crop) {
-        modelContext.delete(crop)
-        try? modelContext.save()
-        dismiss()
-    }
-    
-    //==================================================//
-    //  MARK: - 追加画面表示
+    //  MARK: - Body
     //==================================================//
     var body: some View {
-        
-        NavigationView  {
-            
-            Form{
+        NavigationView {
+            Form {
                 
-                // 名前
-                Section {
-                    TextField("", text: $name)
+                // 名前入力
+                Section(header: Text("野菜の名前")) {
+                    TextField("", text: $cropName)
                         .textFieldStyle(.roundedBorder)
                         .font(.largeTitle.weight(.light))
-                } header: {
-                    Text("野菜の名前")
                 }
                 
-                Section {
+                // カスタマイズ
+                Section(header: Text("カスタマイズ")) {
                     // アイコン
-                    Picker("アイコン", selection: $selectedCropIcon){
-                        ForEach(CropIcon.allCases){icon in
-                            HStack{
-                                Image(systemName: icon.cropIcon)
-                                Text(icon.CropIconName)
+                    Picker("アイコン", selection: $selectedIcon) {
+                        ForEach(CropIcon.allCases) { icon in
+                            HStack {
+                                Image(systemName: icon.systemIconName)
+                                Text(icon.displayName)
                             }
                             .tag(icon)
                         }
                     }
                     
-                    // 色
-                    Picker("カラー", selection: $selectedCropColor){
-                        ForEach(CropColor.allCases){color in
+                    // カラー
+                    Picker("カラー", selection: $selectedColor) {
+                        ForEach(CropColor.allCases) { color in
                             Image(systemName: "circle.fill")
                                 .symbolRenderingMode(.palette)
                                 .foregroundStyle(color.cropColor)
@@ -106,33 +66,22 @@ struct FormCropView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    
-                } header: {
-                    Text("カスタマイズ")
                 }
             }
             .navigationTitle(editingCrop == nil ? "野菜の追加" : "野菜の編集")
         }
         .onAppear {
-            if let editingCrop = editingCrop {
-                name = editingCrop.name
-                selectedCropIcon = editingCrop.icon
-                selectedCropColor = editingCrop.color
-            }
+            initializeForm()
         }
         
+        // ボタンエリア
         VStack(spacing: 12) {
-            // 保存
-            Button{
-                // 名前が入力されている場合のみアクティブにする
-                if name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty{
-                    return
-                }else{
-                    saveCrop()
-                    dismiss()
-                }
-                
-            }label: {
+            
+            // 保存 / 追加
+            Button {
+                guard !cropName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+                saveCrop()
+            } label: {
                 Text(editingCrop == nil ? "追加" : "保存")
                     .font(.title2.weight(.medium))
                     .frame(maxWidth: .infinity)
@@ -140,12 +89,12 @@ struct FormCropView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
-            .disabled(name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .disabled(cropName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             
             // キャンセル
-            Button{
+            Button {
                 dismiss()
-            }label: {
+            } label: {
                 Text("キャンセル")
                     .frame(maxWidth: .infinity)
             }
@@ -153,7 +102,7 @@ struct FormCropView: View {
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             
-            // 削除
+            // 削除ボタン（編集モードのみ表示）
             if let editingCrop = editingCrop {
                 Button(role: .destructive) {
                     showDeleteAlert = true
@@ -166,11 +115,8 @@ struct FormCropView: View {
                 .controlSize(.large)
                 .buttonBorderShape(.roundedRectangle)
                 .tint(.red)
-                // ===== 削除確認アラート =====
                 .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
-                    Button("削除", role: .destructive) {
-                        deleteCrop(editingCrop)
-                    }
+                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
                     Button("キャンセル", role: .cancel) {}
                 } message: {
                     Text("この操作は取り消せません。")
@@ -178,10 +124,60 @@ struct FormCropView: View {
             }
         }
         .padding()
+    }
+    
+    //==================================================//
+    //  MARK: - 編集データ初期化
+    //==================================================//
+    private func initializeForm() {
+        guard let editingCrop = editingCrop else { return }
+        cropName = editingCrop.name
+        selectedIcon = editingCrop.icon
+        selectedColor = editingCrop.color
+    }
+    
+    //==================================================//
+    //  MARK: - 保存処理
+    //==================================================//
+    private func saveCrop() {
+        if let editingCrop = editingCrop {
+            // 編集モード
+            editingCrop.name = cropName
+            editingCrop.icon = selectedIcon
+            editingCrop.color = selectedColor
+        } else {
+            // 新規作成モード
+            let descriptor = FetchDescriptor<Crop>(sortBy: [SortDescriptor(\.orderIndex)])
+            let crops = (try? modelContext.fetch(descriptor)) ?? []
+            let newOrderIndex = (crops.map { $0.orderIndex }.max() ?? -1) + 1
+            
+            let newCrop = Crop(
+                orderIndex: newOrderIndex,
+                name: cropName,
+                icon: selectedIcon,
+                color: selectedColor
+            )
+            modelContext.insert(newCrop)
+        }
         
+        try? modelContext.save()
+        dismiss()
+    }
+    
+    //==================================================//
+    //  MARK: - 削除処理
+    //==================================================//
+    private func deleteCrop(_ crop: Crop) {
+        modelContext.delete(crop)
+        try? modelContext.save()
+        dismiss()
     }
 }
 
+//==================================================//
+//  MARK: - Preview
+//==================================================//
 #Preview {
     FormCropView()
 }
+
