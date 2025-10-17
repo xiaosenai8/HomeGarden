@@ -22,33 +22,47 @@ struct FormCropView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     
+    var editingCrop: Crop?
+    
     @State private var name: String = ""
-    @State private var selsctedCropIcon: CropIcon = .tomato
+    @State private var selectedCropIcon: CropIcon = .tomato
     @State private var selectedCropColor: CropColor = .teal
+    @State private var showDeleteAlert = false
     
     //==================================================//
-    //  MARK: - データ追加
+    //  MARK: - データ保存
     //==================================================//
-    private func addNewCrop() {
+    private func saveCrop() {
+        if let editingCrop = editingCrop {
+            // 編集モード
+            editingCrop.name = name
+            editingCrop.icon = selectedCropIcon
+            editingCrop.color = selectedCropColor
+        } else {
+            // 新規作成モード
+            let descriptor = FetchDescriptor<Crop>(sortBy: [SortDescriptor(\.orderIndex)])
+            let crops = (try? modelContext.fetch(descriptor)) ?? []
+            let newOrderIndex = (crops.map { $0.orderIndex }.max() ?? -1) + 1
+            
+            let newCrop = Crop(
+                orderIndex: newOrderIndex,
+                name: name,
+                icon: selectedCropIcon,
+                color: selectedCropColor
+            )
+            modelContext.insert(newCrop)
+        }
         
-        // SwiftData から既存の Crop を取得して、orderIndex でソート
-        let descriptor = FetchDescriptor<Crop>(sortBy: [SortDescriptor(\.orderIndex)])
-        let crops = (try? modelContext.fetch(descriptor)) ?? []
-        
-        // 現在の最大 orderIndex を取得し、新しい Crop の orderIndex を決定
-        // crops が空の場合は -1 からスタートするので最初の orderIndex は 0 になる
-        let newOrderIndex = (crops.map { $0.orderIndex }.max() ?? -1) + 1
-        
-        // 新しい Crop を作成し、決めた orderIndex をセット
-        let newCrop = Crop(orderIndex: newOrderIndex, name: name, icon: selsctedCropIcon, color: selectedCropColor)
-        
-        // モデルコンテキストに挿入（保存待ち状態になる）
-        modelContext.insert(newCrop)
-        
-        // データベースに保存
         try? modelContext.save()
-        
-        // モーダルや画面を閉じる
+        dismiss()
+    }
+    
+    //==================================================//
+    //  MARK: - データ削除
+    //==================================================//
+    private func deleteCrop(_ crop: Crop) {
+        modelContext.delete(crop)
+        try? modelContext.save()
         dismiss()
     }
     
@@ -72,7 +86,7 @@ struct FormCropView: View {
                 
                 Section {
                     // アイコン
-                    Picker("アイコン", selection: $selsctedCropIcon){
+                    Picker("アイコン", selection: $selectedCropIcon){
                         ForEach(CropIcon.allCases){icon in
                             HStack{
                                 Image(systemName: icon.cropIcon)
@@ -97,7 +111,14 @@ struct FormCropView: View {
                     Text("カスタマイズ")
                 }
             }
-            .navigationTitle("野菜の追加")
+            .navigationTitle(editingCrop == nil ? "野菜の追加" : "野菜の編集")
+        }
+        .onAppear {
+            if let editingCrop = editingCrop {
+                name = editingCrop.name
+                selectedCropIcon = editingCrop.icon
+                selectedCropColor = editingCrop.color
+            }
         }
         
         VStack(spacing: 12) {
@@ -107,12 +128,12 @@ struct FormCropView: View {
                 if name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty{
                     return
                 }else{
-                    addNewCrop()
+                    saveCrop()
                     dismiss()
                 }
                 
             }label: {
-                Text("追加")
+                Text(editingCrop == nil ? "追加" : "保存")
                     .font(.title2.weight(.medium))
                     .frame(maxWidth: .infinity)
             }
@@ -131,6 +152,30 @@ struct FormCropView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
+            
+            // 削除
+            if let editingCrop = editingCrop {
+                Button(role: .destructive) {
+                    showDeleteAlert = true
+                } label: {
+                    Text("削除")
+                        .font(.title2.weight(.medium))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .buttonBorderShape(.roundedRectangle)
+                .tint(.red)
+                // ===== 削除確認アラート =====
+                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
+                    Button("削除", role: .destructive) {
+                        deleteCrop(editingCrop)
+                    }
+                    Button("キャンセル", role: .cancel) {}
+                } message: {
+                    Text("この操作は取り消せません。")
+                }
+            }
         }
         .padding()
         

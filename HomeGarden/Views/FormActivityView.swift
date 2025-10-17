@@ -14,12 +14,15 @@ struct FormActivityView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     let crop: Crop
+    var editingActivity: Activity? = nil
     
     @State private var selectedType: ActivityType = .watering  // 作業タイプ
     @State private var selectedDate = Date()                   // 作業日
     @State private var quantity: Int? = nil                    // 数量
     @State private var quantityString: String = ""             // 数量入力用文字列
     @State private var comment: String = ""                    // 作業メモ
+    @State private var showDeleteAlert = false
+
     
     var body: some View {
         NavigationView {
@@ -61,12 +64,10 @@ struct FormActivityView: View {
                 }
                 
                 // 作業メモ
-                Section() {
+                Section("作業メモ") {
                     TextField("", text: $comment)
                         .textFieldStyle(.roundedBorder)
                         .font(.largeTitle.weight(.light))
-                } header: {
-                    Text("作業メモ")
                 }
             }
             .navigationTitle("作業追加")
@@ -74,7 +75,7 @@ struct FormActivityView: View {
         // ===== ボタンエリア =====
         VStack(spacing: 12) {
             Button {
-                addActivity()
+                saveActivity()
                 dismiss()
             } label: {
                 Text("追加")
@@ -85,7 +86,7 @@ struct FormActivityView: View {
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             
-            Button() {
+            Button {
                 dismiss()
             } label: {
                 Text("キャンセル")
@@ -95,21 +96,78 @@ struct FormActivityView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
+            
+            // ===== 削除ボタン追加 =====
+            if let editingActivity = editingActivity {
+                Button(role: .destructive) {
+                    showDeleteAlert = true
+                } label: {
+                    Text("削除")
+                        .font(.title2.weight(.medium))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .buttonBorderShape(.roundedRectangle)
+                .tint(.red)
+                .alert("削除の確認", isPresented: $showDeleteAlert) {
+                    Button("削除", role: .destructive) {
+                        deleteActivity(editingActivity)
+                        dismiss()
+                    }
+                    Button("キャンセル", role: .cancel) { }
+                } message: {
+                    Text("この作業を削除してもよろしいですか？")
+                }
+            }
         }
         .padding()
+        .onAppear {
+            if let editingActivity = editingActivity {
+                // 編集時：既存データを反映
+                selectedType = editingActivity.type
+                selectedDate = editingActivity.date
+                quantity = editingActivity.quantity
+                quantityString = editingActivity.quantity.map { String($0) } ?? ""
+                comment = editingActivity.comment ?? ""
+            }
+        }
     }
     
-    private func addActivity() {
-        let activity = Activity(
-            date: selectedDate,
-            type: selectedType,
-            quantity: quantity,
-            comment: comment,
-            crop: crop
-        )
-        modelContext.insert(activity)
-        crop.activities.append(activity)
+    // ===== 保存処理 =====
+    private func saveActivity() {
+        if let editingActivity = editingActivity {
+            // 編集モード
+            editingActivity.type = selectedType
+            editingActivity.date = selectedDate
+            editingActivity.quantity = quantity
+            editingActivity.comment = comment
+        } else {
+            // 新規追加モード
+            let newActivity = Activity(
+                date: selectedDate,
+                type: selectedType,
+                quantity: quantity,
+                comment: comment,
+                crop: crop
+            )
+            modelContext.insert(newActivity)
+            crop.activities.append(newActivity)
+        }
         try? modelContext.save()
+    }
+    
+    // ===== 削除処理 =====
+    private func deleteActivity(_ activity: Activity) {
+        // Crop側のactivitiesから削除
+        if let index = crop.activities.firstIndex(where: { $0.id == activity.id }) {
+            crop.activities.remove(at: index)
+        }
+        
+        // モデルコンテキストから削除
+        modelContext.delete(activity)
+        try? modelContext.save()
+        dismiss()
     }
 }
 

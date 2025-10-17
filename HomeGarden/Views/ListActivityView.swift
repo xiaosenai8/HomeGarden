@@ -24,6 +24,8 @@ struct ListActivityView: View {
     
     @State private var isAddingActivity = false
     @State private var isSheetPresented = false
+    @State private var isEditMode = false
+    @State private var editingActivity: Activity? = nil
     
     init(crop: Crop) {
         self.crop = crop
@@ -46,18 +48,6 @@ struct ListActivityView: View {
                         Image(systemName: "plus.app")
                             .symbolRenderingMode(.palette)
                             .foregroundStyle(.teal)
-                            .font(.system(size: 20, weight: .semibold))
-                    }
-                    
-                    // ボタン：編集モード切替
-                    Button {
-                        withAnimation {
-//                            isEditMode.toggle()
-                        }
-                    } label: {
-                        Image(systemName: "pencil")
-                            .symbolRenderingMode(.palette)
-//                            .foregroundStyle(isEditMode ? .orange : .teal)
                             .font(.system(size: 20, weight: .semibold))
                     }
                 }
@@ -117,24 +107,32 @@ struct ListActivityView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 8)
                             )
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    // 編集用の Activity をセットしてシート表示
+                                    editingActivity = activity
+                                    isSheetPresented = true
+                                } label: {
+                                    Label("編集", systemImage: "pencil")
+                                }
+                                .tint(.blue)
+                            }
                     }
                 }
                 .listRowSeparator(.hidden)
             }
             .scrollContentBackground(.hidden)
             .sheet(isPresented: $isSheetPresented) {
-                FormActivityView(crop: crop)
+                if let editingActivity {
+                    FormActivityView(crop: crop, editingActivity: editingActivity)
+                } else {
+                    FormActivityView(crop: crop)
+                }
             }
         }
         .padding()
     }
 
-    private func deleteActivity(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(activities[index])
-        }
-        try? modelContext.save()
-    }
 }
 
 

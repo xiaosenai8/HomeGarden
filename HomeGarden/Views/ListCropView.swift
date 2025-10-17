@@ -28,6 +28,7 @@ struct ListCropView: View {
     @State private var isSheetPresented = false
     @State private var isEditMode = false
     @State private var selectedCrop: Crop?
+    @State private var editingCrop: Crop?
     
     //==================================================//
     //  MARK: - ビュー
@@ -57,7 +58,7 @@ struct ListCropView: View {
                         
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button {
-                                // TODO:
+                                editingCrop = crop
                             } label: {
                                 Label("編集", systemImage: "pencil")
                             }
@@ -74,13 +75,14 @@ struct ListCropView: View {
                         }
 
                     }
-                    .onDelete(perform: deleteCrop)
                     .onMove(perform: moveCrop)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .background(Color.white)
                 .environment(\.editMode, .constant(isEditMode ? .active : .inactive))
+            }
+            .sheet(item: $editingCrop) { crop in
+                FormCropView(editingCrop: crop)
             }
             .sheet(isPresented: $isSheetPresented) {
                 FormCropView()
