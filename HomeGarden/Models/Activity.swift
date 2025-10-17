@@ -14,11 +14,13 @@ class Activity: Identifiable {
     @Attribute var date: Date
     @Attribute var type: ActivityType
     @Attribute var quantity: Int?
+    @Attribute var comment: String?
     
-    init(date: Date = Date(), type: ActivityType, quantity: Int? = nil, crop: Crop) {
+    init(date: Date = Date(), type: ActivityType, quantity: Int? = nil, comment: String? = nil, crop: Crop) {
         self.date = date
         self.type = type
         self.quantity = quantity
+        self.comment = comment
     }
 }
 

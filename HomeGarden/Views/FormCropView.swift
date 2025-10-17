@@ -81,25 +81,26 @@ struct FormCropView: View {
                             .tag(icon)
                         }
                     }
-                        
-                        // 色
-                        Picker("カラー", selection: $selectedCropColor){
-                            ForEach(CropColor.allCases){color in
-                                Image(systemName: "circle.fill")
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(color.cropColor)
-                                    .tag(color)
-                            }
+                    
+                    // 色
+                    Picker("カラー", selection: $selectedCropColor){
+                        ForEach(CropColor.allCases){color in
+                            Image(systemName: "circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(color.cropColor)
+                                .tag(color)
                         }
-                        .pickerStyle(.segmented)
-                        
-                    } header: {
-                        Text("カスタマイズ")
                     }
+                    .pickerStyle(.segmented)
+                    
+                } header: {
+                    Text("カスタマイズ")
                 }
-                .navigationTitle("野菜の追加")
             }
-            
+            .navigationTitle("野菜の追加")
+        }
+        
+        VStack(spacing: 12) {
             // 保存
             Button{
                 // 名前が入力されている場合のみアクティブにする
@@ -116,7 +117,7 @@ struct FormCropView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .controlSize(.extraLarge)
+            .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             .disabled(name.isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             
@@ -127,10 +128,15 @@ struct FormCropView: View {
                 Text("キャンセル")
                     .frame(maxWidth: .infinity)
             }
-            
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .buttonBorderShape(.roundedRectangle)
         }
+        .padding()
+        
     }
-    
-    #Preview {
-        FormCropView()
-    }
+}
+
+#Preview {
+    FormCropView()
+}

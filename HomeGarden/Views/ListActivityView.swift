@@ -23,6 +23,7 @@ struct ListActivityView: View {
     @Query private var activities: [Activity]
     
     @State private var isAddingActivity = false
+    @State private var isSheetPresented = false
     
     init(crop: Crop) {
         self.crop = crop
@@ -30,35 +31,104 @@ struct ListActivityView: View {
     
     var body: some View {
         VStack {
-            Text(crop.name)
-                .font(.largeTitle.bold())
-            
-            List {
-                ForEach(activities) { activity in
-                    HStack {
-                        Text(activity.type.displayName)
-                        Spacer()
-                        if let q = activity.quantity {
-                            Text("\(q)")
+            HStack {
+                
+                Text(crop.name)
+                    .font(.largeTitle.weight(.semibold))
+                
+                Spacer()
+                
+                HStack(spacing: 12) {
+                    // ＋ ボタン：追加
+                    Button {
+                        isSheetPresented = true
+                    } label: {
+                        Image(systemName: "plus.app")
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.teal)
+                            .font(.system(size: 20, weight: .semibold))
+                    }
+                    
+                    // ボタン：編集モード切替
+                    Button {
+                        withAnimation {
+//                            isEditMode.toggle()
                         }
-                        Text(activity.date, style: .date)
-                            .foregroundColor(.gray)
-                            .font(.caption)
+                    } label: {
+                        Image(systemName: "pencil")
+                            .symbolRenderingMode(.palette)
+//                            .foregroundStyle(isEditMode ? .orange : .teal)
+                            .font(.system(size: 20, weight: .semibold))
                     }
                 }
-                .onDelete(perform: deleteActivity)
             }
             
-            Button("作業追加") {
-                isAddingActivity = true
+            if !crop.activities.isEmpty {
+                let totalQuantity = crop.activities.compactMap { $0.quantity }.reduce(0, +)
+                Text("収量合計：\(totalQuantity)")
+                    .font(.headline)
+                    .foregroundColor(crop.color.cropColor)
+                    .opacity(0.9)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
             }
-            .sheet(isPresented: $isAddingActivity) {
+            
+            List{
+                ForEach(crop.activities.sorted(by: { $0.date < $1.date })) { activity in
+                    HStack{
+                        Image(systemName: "pencil")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .overlay(
+                                Circle()
+                                    .stroke(crop.color.cropColor, lineWidth: 2)
+                                    .opacity(0.4)
+                                    .frame(width: 60, height: 60)
+                            )
+                            .padding(.leading, 5)
+                            .padding(.trailing, 20)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 250, height: 60)
+                            .overlay(
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(activity.date.formattedJapaneseDate)
+                                        .foregroundColor(.gray)
+                                        .font(.caption)
+                                    
+                                    Text(activity.type.displayName)
+                                        .font(.headline)
+                                        .foregroundColor(.primary)
+                                    
+                                    if let quantity = activity.quantity {
+                                        Text("数量: \(quantity)")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    if let comment = activity.comment, !comment.isEmpty {
+                                        Text(comment)
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                            .lineLimit(1)
+                                    }
+                                }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading, 8)
+                            )
+                    }
+                }
+                .listRowSeparator(.hidden)
+            }
+            .scrollContentBackground(.hidden)
+            .sheet(isPresented: $isSheetPresented) {
                 FormActivityView(crop: crop)
             }
         }
         .padding()
     }
-    
+
     private func deleteActivity(at offsets: IndexSet) {
         for index in offsets {
             modelContext.delete(activities[index])
