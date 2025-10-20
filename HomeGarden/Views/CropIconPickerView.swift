@@ -46,7 +46,7 @@ struct CropIconPickerView: View {
             dismiss()
         } label: {
             VStack(spacing: 8) {
-                Image(systemName: icon.iconName)
+                Image(icon.iconName)
                     .resizable()
                     .frame(width: 35, height: 35)
                     .foregroundColor(Color.red)
