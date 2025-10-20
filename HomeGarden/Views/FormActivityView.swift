@@ -59,7 +59,7 @@ struct FormActivityView: View {
                 Section("作業タイプ") {
                     Picker("作業", selection: $selectedType) {
                         ForEach(ActivityType.allCases) { type in
-                            Text(type.displayName).tag(type)
+                            Text(type.activityName).tag(type)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -155,7 +155,7 @@ struct FormActivityView: View {
     /// 編集モード時に既存データをフォームに反映
     private func initializeEditingActivity() {
         guard let editingActivity = editingActivity else { return }
-        selectedType = editingActivity.type
+        selectedType = editingActivity.activity
         selectedDate = editingActivity.date
         quantity = editingActivity.quantity
         quantityString = editingActivity.quantity.map { String($0) } ?? ""
@@ -170,18 +170,17 @@ struct FormActivityView: View {
     private func saveActivity() {
         if let editingActivity = editingActivity {
             // 編集モード: 既存オブジェクトを更新
-            editingActivity.type = selectedType
             editingActivity.date = selectedDate
+            editingActivity.activity = selectedType
             editingActivity.quantity = quantity
             editingActivity.comment = comment
         } else {
             // 新規作成モード
             let newActivity = Activity(
                 date: selectedDate,
-                type: selectedType,
+                activity: selectedType,
                 quantity: quantity,
-                comment: comment,
-                crop: crop
+                comment: comment
             )
             modelContext.insert(newActivity)
             crop.activities.append(newActivity)

@@ -23,8 +23,14 @@ class Activity: Identifiable {
     /// 作業日
     @Attribute var date: Date
     
-    /// 作業タイプ
-    @Attribute var type: ActivityType
+    /// 作業タイプ（列挙型として扱う computed property）
+    var activity: ActivityType {
+        get { ActivityType(rawValue: activityValue) ?? .watering }
+        set { activityValue = newValue.rawValue }
+   }
+    
+    /// 保存用の値
+    @Attribute var activityValue: Int = ActivityType.watering.rawValue
     
     /// 作業数量（任意）
     @Attribute var quantity: Int?
@@ -42,35 +48,11 @@ class Activity: Identifiable {
     ///   - type: 作業タイプ
     ///   - quantity: 作業数量（任意）
     ///   - comment: 作業コメント（任意）
-    ///   - crop: 紐づく作物（未使用だが将来の拡張用）
-    init(date: Date = Date(), type: ActivityType, quantity: Int? = nil, comment: String? = nil, crop: Crop) {
+    init(date: Date = Date(), activity: ActivityType, quantity: Int? = nil, comment: String? = nil) {
         self.date = date
-        self.type = type
+        self.activityValue = activity.rawValue
         self.quantity = quantity
         self.comment = comment
-    }
-}
-
-//==================================================//
-//  MARK: - 列挙型
-//==================================================//
-
-/// 作業タイプを管理する列挙型
-enum ActivityType: Int, Codable, CaseIterable, Identifiable {
-    
-    /// Identifiable 用の id
-    var id: Int { rawValue }
-    
-    case sowing, watering, fertilizing, harvesting
-    
-    /// 表示用名称
-    var displayName: String {
-        switch self {
-        case .sowing: return "種まき"
-        case .watering: return "水やり"
-        case .fertilizing: return "追肥"
-        case .harvesting: return "収穫"
-        }
     }
 }
 

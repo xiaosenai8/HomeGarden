@@ -146,7 +146,7 @@ private struct ActivityRow: View {
                         .foregroundColor(.gray)
                         .font(.caption)
                     
-                    Text(activity.type.displayName)
+                    Text(activity.activity.activityName)
                         .font(.headline)
                         .foregroundColor(.primary)
                     
@@ -180,8 +180,8 @@ private struct ActivityRow: View {
     let context = container.mainContext
     
     let sampleCrop = Crop(orderIndex: 0, name: "トマト", icon: .tomato, color: .red)
-    let sampleActivity1 = Activity(date: Date(), type: .harvesting, quantity: 3, crop: sampleCrop)
-    let sampleActivity2 = Activity(date: Date().addingTimeInterval(-86400 * 2), type: .watering, quantity: nil, crop: sampleCrop)
+    let sampleActivity1 = Activity(date: Date(), activity: .watering, quantity: 3)
+    let sampleActivity2 = Activity(date: Date().addingTimeInterval(-86400 * 2), activity: .watering, quantity: nil)
     sampleCrop.activities = [sampleActivity1, sampleActivity2]
     
     context.insert(sampleCrop)
