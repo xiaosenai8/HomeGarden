@@ -83,10 +83,10 @@ extension Crop {
         )
         
         container.mainContext.insert(Crop(orderIndex: 1, name: "トマト", icon: .tomato, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 2, name: "なす", icon: .cucumber, color: .teal))
-        container.mainContext.insert(Crop(orderIndex: 3, name: "ピーマン", icon: .eggplant, color: .green))
-        container.mainContext.insert(Crop(orderIndex: 4, name: "いちご", icon: .cucumber, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 5, name: "にんにく", icon: .eggplant, color: .orange))
+        container.mainContext.insert(Crop(orderIndex: 2, name: "ブロッコリー", icon: .broccoli, color: .teal))
+        container.mainContext.insert(Crop(orderIndex: 3, name: "にんじん", icon: .carrot, color: .green))
+        container.mainContext.insert(Crop(orderIndex: 4, name: "たまねぎ", icon: .onion, color: .red))
+        container.mainContext.insert(Crop(orderIndex: 5, name: "にんにく", icon: .garlic, color: .orange))
         
         return container
     }

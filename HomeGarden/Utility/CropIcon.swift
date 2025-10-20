@@ -15,24 +15,14 @@ enum CropIcon: Int, Codable, CaseIterable, Identifiable {
     
     var id: Int { rawValue }
     
-    case tomato   = 1
-    case eggplant = 2
-    case cucumber = 3
-}
-
-//==================================================//
-//  MARK: - 表示名
-//==================================================//
-extension CropIcon {
-    
-    /// 日本語での作物名
-    var displayName: String {
-        switch self {
-        case .tomato:   return "トマト"
-        case .eggplant: return "ナス"
-        case .cucumber: return "きゅうり"
-        }
-    }
+    case tomato               = 1
+    case radish               = 2
+    case onion                = 3
+    case japaneseWhiteRadish  = 4
+    case garlic               = 5
+    case chineseCabbage       = 6
+    case carrot               = 7
+    case broccoli             = 8
 }
 
 //==================================================//
@@ -41,12 +31,26 @@ extension CropIcon {
 extension CropIcon {
     
     /// SwiftUI で使用する SF Symbols 名
-    var systemIconName: String {
+    var iconName: String {
         switch self {
-        case .tomato:   return "sun.min"
-        case .eggplant: return "moon"
-        case .cucumber: return "cloud"
+        case .tomato:
+            "tomato"
+        case .radish:
+            "radish"
+        case .onion:
+            "onion"
+        case .japaneseWhiteRadish:
+            "japaneseWhiteRadish"
+        case .garlic:
+            "garlic"
+        case .chineseCabbage:
+            "chineseCabbage"
+        case .carrot:
+            "carrot"
+        case .broccoli:
+            "broccoli"
         }
     }
 }
+
 

@@ -49,8 +49,7 @@ struct FormCropView: View {
                     Picker("アイコン", selection: $selectedIcon) {
                         ForEach(CropIcon.allCases) { icon in
                             HStack {
-                                Image(systemName: icon.systemIconName)
-                                Text(icon.displayName)
+                                Image(icon.iconName)
                             }
                             .tag(icon)
                         }

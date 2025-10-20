@@ -166,7 +166,7 @@ private struct CropRowView: View {
     
     var body: some View {
         HStack {
-            Image(systemName: crop.icon.systemIconName)
+            Image(crop.icon.iconName)
                 .foregroundColor(crop.color.cropColor)
                 .padding(16)
                 .font(.system(size: 24, weight: .semibold))
