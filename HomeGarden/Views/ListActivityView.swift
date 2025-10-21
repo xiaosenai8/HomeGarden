@@ -123,7 +123,7 @@ private struct ActivityRow: View {
     }
     
     private var iconView: some View {
-        Image(systemName: "pencil")
+        Image(systemName: activity.activity.activityIcon)
             .resizable()
             .frame(width: 20, height: 20)
             .overlay(

@@ -39,7 +39,7 @@ struct FormActivityView: View {
     //==================================================//
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 
                 // 作業日
@@ -56,13 +56,18 @@ struct FormActivityView: View {
                 }
                 
                 // 作業タイプ
+//                Section("作業タイプ") {
+//                    Picker("作業", selection: $selectedType) {
+//                        ForEach(ActivityType.allCases) { type in
+//                            Text(type.activityName).tag(type)
+//                        }
+//                    }
+//                    .pickerStyle(.segmented)
+//                }
+                
                 Section("作業タイプ") {
-                    Picker("作業", selection: $selectedType) {
-                        ForEach(ActivityType.allCases) { type in
-                            Text(type.activityName).tag(type)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                    ActivityTypeGrid(selectedType: $selectedType)
+                        .padding(.vertical, 4)
                 }
                 
                 // 数量
@@ -201,7 +206,60 @@ struct FormActivityView: View {
         try? modelContext.save()
         dismiss()
     }
+    
+    //==================================================//
+    // MARK: - グリッド全体ビュー
+    //==================================================//
+    struct ActivityTypeGrid: View {
+        @Binding var selectedType: ActivityType
+        
+        private let columns = [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
+        
+        var body: some View {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(ActivityType.allCases) { type in
+                    ActivityTypeButton(type: type, selectedType: $selectedType)
+                }
+            }
+        }
+    }
+    //==================================================//
+    // MARK: - 個別アイテムビュー
+    //==================================================//
+    struct ActivityTypeButton: View {
+        let type: ActivityType
+        @Binding var selectedType: ActivityType
+        
+        var body: some View {
+            Button {
+                selectedType = type
+            } label: {
+                VStack(spacing: 8) {
+                    Image(systemName: type.activityIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .foregroundColor(selectedType == type ? .white : .teal)
+                    Text(type.activityName)
+                        .font(.footnote)
+                        .foregroundColor(selectedType == type ? .white : .primary)
+                }
+                .frame(maxWidth: .infinity, minHeight: 70)
+                .padding(8)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(selectedType == type ? Color.teal : Color.gray.opacity(0.15))
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
 }
+
 
 //==================================================//
 //  MARK: - Preview

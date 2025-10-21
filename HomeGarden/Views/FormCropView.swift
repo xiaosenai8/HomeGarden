@@ -35,90 +35,94 @@ struct FormCropView: View {
     //==================================================//
     var body: some View {
         NavigationStack(path: $navigationPath) {
-            VStack {
-                // フォーム
-                Form {
-                    // 名前入力
-                    Section(header: Text("野菜の名前")) {
-                        TextField("", text: $cropName)
-                            .textFieldStyle(.roundedBorder)
-                            .font(.largeTitle.weight(.light))
-                    }
-                    
-                    // アイコン選択
-                    Section(header: Text("アイコン")) {
-                        NavigationLink {
-                            CropIconPickerView(selectedIcon: $selectedIcon)
-                        } label: {
-                            HStack {
-                                Image(selectedIcon.iconName)
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                            }
-                            .padding(.vertical, 4)
+            // フォーム
+            Form {
+                // 名前入力
+                Section(header: Text("野菜の名前")) {
+                    TextField("", text: $cropName)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.largeTitle.weight(.light))
+                }
+                
+                // アイコン選択
+                Section(header: Text("アイコン")) {
+                    NavigationLink {
+                        CropIconPickerView(selectedIcon: $selectedIcon)
+                    } label: {
+                        HStack {
+                            Image(selectedIcon.iconName)
+                                .resizable()
+                                .frame(width: 30, height: 30)
                         }
-                    }
-                    
-                    // カラー選択
-                    Section(header: Text("カラー")) {
-                        Picker("カラー", selection: $selectedColor) {
-                            ForEach(CropColor.allCases) { color in
-                                Image(systemName: "circle.fill")
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(color.cropColor)
-                                    .tag(color)
-                            }
-                        }
-                        .pickerStyle(.segmented)
+                        .padding(.vertical, 4)
                     }
                 }
                 
-                // ボタン
-                VStack(spacing: 12) {
-                    Button {
-                        guard !cropName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-                        saveCrop()
-                    } label: {
-                        Text(editingCrop == nil ? "追加" : "保存")
-                            .font(.title2.weight(.medium))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .buttonBorderShape(.roundedRectangle)
-                    .disabled(cropName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    
-                    Button("キャンセル") {
-                        dismiss()
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .buttonBorderShape(.roundedRectangle)
-                    
-                    if let editingCrop = editingCrop {
-                        Button(role: .destructive) {
-                            showDeleteAlert = true
-                        } label: {
-                            Text("削除")
-                                .font(.title2.weight(.medium))
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .tint(.red)
-                        .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
-                            Button("削除", role: .destructive) { deleteCrop(editingCrop) }
-                            Button("キャンセル", role: .cancel) {}
-                        } message: {
-                            Text("この操作は取り消せません。")
+                // カラー選択
+                Section(header: Text("カラー")) {
+                    Picker("カラー", selection: $selectedColor) {
+                        ForEach(CropColor.allCases) { color in
+                            Image(systemName: "circle.fill")
+                                .symbolRenderingMode(.palette)
+                                .foregroundStyle(color.cropColor)
+                                .tag(color)
                         }
                     }
+                    .pickerStyle(.segmented)
                 }
-                .padding()
             }
             .navigationTitle(editingCrop == nil ? "野菜の追加" : "野菜の編集")
         }
+        // ボタン
+        VStack(spacing: 12) {
+            
+            Button {
+                saveCrop()
+            } label: {
+                Text(editingCrop == nil ? "追加" : "保存")
+                    .font(.title2.weight(.medium))
+                    .frame(maxWidth: .infinity)
+            }
+            .disabled(cropName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .buttonBorderShape(.roundedRectangle)
+            
+            Button {
+                dismiss()
+            } label: {
+                Text("キャンセル")
+                    .font(.title2.weight(.medium))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+            .buttonBorderShape(.roundedRectangle)
+            
+            if let editingCrop = editingCrop {
+                Button(role: .destructive) {
+                    showDeleteAlert = true
+                } label: {
+                    Text("削除")
+                        .font(.title2.weight(.medium))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .buttonBorderShape(.roundedRectangle)
+                .tint(.red)
+                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
+                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
+                    Button("キャンセル", role: .cancel) {}
+                } message: {
+                    Text("この操作は取り消せません。")
+                }
+            }
+        }
+        .padding()
         .onAppear(perform: initializeForm)
+        
+        
     }
     
     //==================================================//
