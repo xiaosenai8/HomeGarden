@@ -81,14 +81,14 @@ struct ListCropView: View {
                         .font(.system(size: 20, weight: .semibold))
                 }
                 
-                Button {
-                    isFormPresented = true
-                } label: {
-                    Image(systemName: "plus.app")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.teal)
-                        .font(.system(size: 25, weight: .semibold))
-                }
+//                Button {
+//                    isFormPresented = true
+//                } label: {
+//                    Image(systemName: "plus.app")
+//                        .symbolRenderingMode(.palette)
+//                        .foregroundStyle(.teal)
+//                        .font(.system(size: 25, weight: .semibold))
+//                }
             }
         }
         .padding()
@@ -119,6 +119,26 @@ struct ListCropView: View {
                     }
             }
             .onMove(perform: moveCrop)
+            
+            Button {
+                isFormPresented = true
+            } label: {
+                HStack {
+                    Spacer()
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundStyle(.teal)
+                        .font(.system(size: 22, weight: .bold))
+                    Text("新しい野菜を追加")
+                        .font(.headline)
+                        .foregroundColor(.teal)
+                    Spacer()
+                }
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+            .listRowBackground(Color.clear)
+            .opacity(isEditMode ? 0 : 1)
+            
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)

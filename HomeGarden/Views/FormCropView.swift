@@ -47,7 +47,7 @@ struct FormCropView: View {
                 // アイコン選択
                 Section(header: Text("アイコン")) {
                     NavigationLink {
-                        CropIconPickerView(selectedIcon: $selectedIcon)
+                        PickerCropIconView(selectedIcon: $selectedIcon)
                     } label: {
                         HStack {
                             Image(selectedIcon.iconName)

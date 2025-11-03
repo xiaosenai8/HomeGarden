@@ -30,24 +30,45 @@ struct ListActivityView: View {
     //  MARK: - Body
     //==================================================//
     var body: some View {
-        VStack {
-            
-            headerView
-            
-            if !crop.activities.isEmpty {
-                totalQuantityView
+        ZStack(alignment: .bottomTrailing) {
+            VStack {
+                headerView
+                
+                if !crop.activities.isEmpty {
+                    totalQuantityView
+                }
+                
+                activityList
             }
+            .padding(.horizontal)
             
-            activityList
+            Button {
+                isFormPresented = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 60, height: 60)
+                    .background(Circle().fill(.teal))
+                    .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 3)
+            }
+            .padding()
+            .accessibilityLabel("新しい作業を追加")
         }
-        .padding()
+//        .sheet(isPresented: $isFormPresented) {
+//            if let editingActivity {
+//                FormActivityView(crop: crop, editingActivity: editingActivity)
+//            } else {
+//                FormActivityView(crop: crop)
+//            }
+//        }
         .sheet(isPresented: $isFormPresented) {
-            if let editingActivity {
-                FormActivityView(crop: crop, editingActivity: editingActivity)
-            } else {
-                FormActivityView(crop: crop)
-            }
+            FormActivityView(crop: crop)
         }
+        .sheet(item: $editingActivity) { activity in
+            FormActivityView(crop: crop, editingActivity: activity)
+        }
+        
     }
     
     //==================================================//
@@ -59,15 +80,7 @@ struct ListActivityView: View {
                 .font(.largeTitle.weight(.semibold))
             
             Spacer()
-            
-            Button {
-                isFormPresented = true
-            } label: {
-                Image(systemName: "plus.app")
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(.teal)
-                    .font(.system(size: 20, weight: .semibold))
-            }
+
         }
     }
     
@@ -90,19 +103,11 @@ struct ListActivityView: View {
     private var activityList: some View {
         List {
             ForEach(crop.activities.sorted(by: { $0.date < $1.date })) { activity in
-                ActivityRow(activity: activity, crop: crop)
-                
-//                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-//                        Button {
-//                            editingActivity = activity
-//                            isFormPresented = true
-//                        } label: {
-//                            Label("編集", systemImage: "pencil")
-//                        }
-//                        .tint(.blue)
-//                    }
+                ActivityRow(activity: activity, crop: crop) {
+                    editingActivity = activity
+                }
+                .listRowSeparator(.hidden)
             }
-            .listRowSeparator(.hidden)
         }
         .scrollContentBackground(.hidden)
     }
@@ -114,13 +119,17 @@ struct ListActivityView: View {
 private struct ActivityRow: View {
     let activity: Activity
     let crop: Crop
+    var onTap: (() -> Void)? = nil
     
     var body: some View {
         HStack {
             iconView
             contentView
         }
-
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTap?()
+        }
     }
     
     private var iconView: some View {

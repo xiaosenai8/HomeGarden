@@ -1,15 +1,15 @@
 //==================================================//
-//  MARK: - CropIconPickerView.swift
+//  MARK: - PickerActivityTypeView.swift
 //  作成者: konishi
 //  作成日: 2025/10/18
-//  説明  : 作物アイコンを選択するビュー
+//  説明  : アクティビティを選択するビュー
 //==================================================//
 
 import SwiftUI
 
-struct CropIconPickerView: View {
+struct PickerActivityTypeView: View {
     // 親から選択状態を受け取る（双方向バインディング）
-    @Binding var selectedIcon: CropIcon
+    @Binding var selectedActivity: ActivityType
     @Environment(\.dismiss) private var dismiss
     
     // グリッド設定
@@ -21,44 +21,54 @@ struct CropIconPickerView: View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(CropIcon.allCases) { icon in
-                        iconButton(for: icon)
+                    ForEach(ActivityType.allCases) { activity in
+                        iconButton(for: activity)
                     }
                 }
                 .padding()
             }
             .background(Color(.systemGray6)) // スクロール領域の背景
-            .navigationTitle("アイコンを選択")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("閉じる") { dismiss() }
-                }
-            }
+            .navigationTitle("作業を選択")
+//            .toolbar {
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button {
+//                        dismiss()
+//                    } label: {
+//                        Image(systemName: "xmark")
+//                    }
+//                }
+//
+//            }
         }
     }
     
     //==================================================//
     // MARK: - アイコンボタン
     //==================================================//
-    private func iconButton(for icon: CropIcon) -> some View {
+    private func iconButton(for activity: ActivityType) -> some View {
         Button {
-            selectedIcon = icon
+            selectedActivity = activity
             dismiss()
         } label: {
+
             VStack(spacing: 8) {
-                Image(icon.iconName)
+                Image(systemName: activity.activityIcon)
                     .resizable()
                     .frame(width: 35, height: 35)
-                    .foregroundColor(Color.red)
+                    .foregroundColor(.teal)
                     .opacity(0.8)
+                Text(activity.activityName)
+                    .font(.footnote)
+                    .foregroundColor(.teal)
             }
+            
             .frame(width: 70, height: 70)
             .background(Color.white)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(selectedIcon == icon ? Color.teal : Color.clear, lineWidth: 2)
+                    .stroke(selectedActivity == activity ? Color.teal : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(.plain)
@@ -70,7 +80,7 @@ struct CropIconPickerView: View {
 //==================================================//
 #Preview {
     // Binding を作るには .constant を使う
-    CropIconPickerView(selectedIcon: .constant(.tomato))
+    PickerActivityTypeView(selectedActivity: .constant(.watering))
 }
 
 
