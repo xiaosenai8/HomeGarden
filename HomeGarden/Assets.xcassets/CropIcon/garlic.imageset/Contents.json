@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "garlic.png",
+      "filename" : "にんにくアイコン1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "garlic 1.png",
+      "filename" : "にんにくアイコン1 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "garlic 2.png",
+      "filename" : "にんにくアイコン1 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

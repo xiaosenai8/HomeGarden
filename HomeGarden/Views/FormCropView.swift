@@ -72,6 +72,15 @@ struct FormCropView: View {
                 }
             }
             .navigationTitle(editingCrop == nil ? "野菜の追加" : "野菜の編集")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
         }
         // ボタン
         VStack(spacing: 12) {
@@ -88,36 +97,36 @@ struct FormCropView: View {
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             
-            Button {
-                dismiss()
-            } label: {
-                Text("キャンセル")
-                    .font(.title2.weight(.medium))
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .buttonBorderShape(.roundedRectangle)
-            
-            if let editingCrop = editingCrop {
-                Button(role: .destructive) {
-                    showDeleteAlert = true
-                } label: {
-                    Text("削除")
-                        .font(.title2.weight(.medium))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .buttonBorderShape(.roundedRectangle)
-                .tint(.red)
-                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
-                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
-                    Button("キャンセル", role: .cancel) {}
-                } message: {
-                    Text("この操作は取り消せません。")
-                }
-            }
+//            Button {
+//                dismiss()
+//            } label: {
+//                Text("キャンセル")
+//                    .font(.title2.weight(.medium))
+//                    .frame(maxWidth: .infinity)
+//            }
+//            .buttonStyle(.bordered)
+//            .controlSize(.large)
+//            .buttonBorderShape(.roundedRectangle)
+//            
+//            if let editingCrop = editingCrop {
+//                Button(role: .destructive) {
+//                    showDeleteAlert = true
+//                } label: {
+//                    Text("削除")
+//                        .font(.title2.weight(.medium))
+//                        .frame(maxWidth: .infinity)
+//                }
+//                .buttonStyle(.borderedProminent)
+//                .controlSize(.large)
+//                .buttonBorderShape(.roundedRectangle)
+//                .tint(.red)
+//                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
+//                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
+//                    Button("キャンセル", role: .cancel) {}
+//                } message: {
+//                    Text("この操作は取り消せません。")
+//                }
+//            }
         }
         .padding()
         .onAppear(perform: initializeForm)

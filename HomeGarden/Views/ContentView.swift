@@ -39,7 +39,7 @@ struct ContentView: View {
             //==================================================//
             SettingView()
                 .tabItem {
-                    Label("設定", systemImage: "gearshape")
+                    Label("ホーム", systemImage: "person")
                 }
         }
         .accentColor(.teal) // タブ選択時のテーマカラー

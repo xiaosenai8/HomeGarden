@@ -71,22 +71,23 @@ struct ListCropView: View {
             Spacer()
             
             HStack(spacing: 12) {
+                
+                Button {
+                    withAnimation { isEditMode.toggle() }
+                } label: {
+                    Image(systemName: "arrow.up.and.down.text.horizontal")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(isEditMode ? .orange : .teal)
+                        .font(.system(size: 20, weight: .semibold))
+                }
+                
                 Button {
                     isFormPresented = true
                 } label: {
                     Image(systemName: "plus.app")
                         .symbolRenderingMode(.palette)
                         .foregroundStyle(.teal)
-                        .font(.system(size: 20, weight: .semibold))
-                }
-                
-                Button {
-                    withAnimation { isEditMode.toggle() }
-                } label: {
-                    Image(systemName: "line.3.horizontal")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(isEditMode ? .orange : .teal)
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.system(size: 25, weight: .semibold))
                 }
             }
         }
@@ -100,14 +101,14 @@ struct ListCropView: View {
         List {
             ForEach(crops) { crop in
                 cropRow(crop)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button {
-                            editingCrop = crop
-                        } label: {
-                            Label("編集", systemImage: "pencil")
-                        }
-                        .tint(.teal)
-                    }
+//                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+//                        Button {
+//                            editingCrop = crop
+//                        } label: {
+//                            Label("編集", systemImage: "pencil")
+//                        }
+//                        .tint(.teal)
+//                    }
                     .swipeActions(edge: .leading, allowsFullSwipe: false) {
                         Button {
                             archiveCrop(crop)
@@ -135,7 +136,7 @@ struct ListCropView: View {
         .contentShape(Rectangle())
         .listRowInsets(.init(top: 10, leading: 20, bottom: 10, trailing: 10))
         .listRowSeparator(.hidden)
-        .cornerRadius(10)
+        .cornerRadius(16)
     }
     
     //==================================================//
@@ -167,9 +168,11 @@ private struct CropRowView: View {
     var body: some View {
         HStack {
             Image(crop.icon.iconName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 30, height: 30)
                 .foregroundColor(crop.color.cropColor)
                 .padding(16)
-                .font(.system(size: 24, weight: .semibold))
             
             Text(crop.name)
                 .font(.headline.weight(.semibold))

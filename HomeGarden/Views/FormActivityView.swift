@@ -93,6 +93,15 @@ struct FormActivityView: View {
                 }
             }
             .navigationTitle(editingActivity == nil ? "作業追加" : "作業保存")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+            }
         }
         
         // ボタンエリア
@@ -111,41 +120,41 @@ struct FormActivityView: View {
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             
-            // キャンセル
-            Button {
-                dismiss()
-            } label: {
-                Text("キャンセル")
-                    .font(.title2.weight(.medium))
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .buttonBorderShape(.roundedRectangle)
+//            // キャンセル
+//            Button {
+//                dismiss()
+//            } label: {
+//                Text("キャンセル")
+//                    .font(.title2.weight(.medium))
+//                    .frame(maxWidth: .infinity)
+//            }
+//            .buttonStyle(.bordered)
+//            .controlSize(.large)
+//            .buttonBorderShape(.roundedRectangle)
             
-            // 削除（編集モード時のみ表示）
-            if let editingActivity = editingActivity {
-                Button(role: .destructive) {
-                    showDeleteAlert = true
-                } label: {
-                    Text("削除")
-                        .font(.title2.weight(.medium))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .buttonBorderShape(.roundedRectangle)
-                .tint(.red)
-                .alert("削除の確認", isPresented: $showDeleteAlert) {
-                    Button("削除", role: .destructive) {
-                        deleteActivity(editingActivity)
-                        dismiss()
-                    }
-                    Button("キャンセル", role: .cancel) { }
-                } message: {
-                    Text("この作業を削除してもよろしいですか？")
-                }
-            }
+//            // 削除（編集モード時のみ表示）
+//            if let editingActivity = editingActivity {
+//                Button(role: .destructive) {
+//                    showDeleteAlert = true
+//                } label: {
+//                    Text("削除")
+//                        .font(.title2.weight(.medium))
+//                        .frame(maxWidth: .infinity)
+//                }
+//                .buttonStyle(.borderedProminent)
+//                .controlSize(.large)
+//                .buttonBorderShape(.roundedRectangle)
+//                .tint(.red)
+//                .alert("削除の確認", isPresented: $showDeleteAlert) {
+//                    Button("削除", role: .destructive) {
+//                        deleteActivity(editingActivity)
+//                        dismiss()
+//                    }
+//                    Button("キャンセル", role: .cancel) { }
+//                } message: {
+//                    Text("この作業を削除してもよろしいですか？")
+//                }
+//            }
         }
         .padding()
         .onAppear {

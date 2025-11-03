@@ -91,15 +91,16 @@ struct ListActivityView: View {
         List {
             ForEach(crop.activities.sorted(by: { $0.date < $1.date })) { activity in
                 ActivityRow(activity: activity, crop: crop)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        Button {
-                            editingActivity = activity
-                            isFormPresented = true
-                        } label: {
-                            Label("編集", systemImage: "pencil")
-                        }
-                        .tint(.blue)
-                    }
+                
+//                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+//                        Button {
+//                            editingActivity = activity
+//                            isFormPresented = true
+//                        } label: {
+//                            Label("編集", systemImage: "pencil")
+//                        }
+//                        .tint(.blue)
+//                    }
             }
             .listRowSeparator(.hidden)
         }
