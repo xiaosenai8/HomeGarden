@@ -29,15 +29,6 @@ struct PickerCropIconView: View {
             }
             .background(Color(.systemGray6)) // スクロール領域の背景
             .navigationTitle("アイコンを選択")
-//            .toolbar {
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button {
-//                        dismiss()
-//                    } label: {
-//                        Image(systemName: "xmark")
-//                    }
-//                }
-//            }
         }
     }
     

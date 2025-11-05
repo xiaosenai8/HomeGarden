@@ -55,13 +55,13 @@ struct ListActivityView: View {
             .padding()
             .accessibilityLabel("新しい作業を追加")
         }
-//        .sheet(isPresented: $isFormPresented) {
-//            if let editingActivity {
-//                FormActivityView(crop: crop, editingActivity: editingActivity)
-//            } else {
-//                FormActivityView(crop: crop)
-//            }
-//        }
+        //        .sheet(isPresented: $isFormPresented) {
+        //            if let editingActivity {
+        //                FormActivityView(crop: crop, editingActivity: editingActivity)
+        //            } else {
+        //                FormActivityView(crop: crop)
+        //            }
+        //        }
         .sheet(isPresented: $isFormPresented) {
             FormActivityView(crop: crop)
         }
@@ -77,10 +77,11 @@ struct ListActivityView: View {
     private var headerView: some View {
         HStack {
             Text(crop.name)
+                .foregroundColor(Color("FontColor"))
                 .font(.largeTitle.weight(.semibold))
             
             Spacer()
-
+            
         }
     }
     
@@ -95,6 +96,7 @@ struct ListActivityView: View {
             .opacity(0.9)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
+            .font(.largeTitle.weight(.semibold))
     }
     
     //==================================================//
@@ -123,6 +125,7 @@ private struct ActivityRow: View {
     
     var body: some View {
         HStack {
+            dateView
             iconView
             contentView
         }
@@ -131,53 +134,52 @@ private struct ActivityRow: View {
             onTap?()
         }
     }
+    private var dateView: some View {
+        Text(activity.date.formattedJapaneseDate)
+    }
     
     private var iconView: some View {
-        Image(systemName: activity.activity.activityIcon)
-            .resizable()
-            .frame(width: 20, height: 20)
-            .overlay(
-                Circle()
-                    .stroke(crop.color.cropColor, lineWidth: 2)
-                    .opacity(0.4)
-                    .frame(width: 60, height: 60)
-            )
-            .padding(.leading, 5)
-            .padding(.trailing, 20)
+        ZStack {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(crop.color.cropColor)
+                .frame(width: 44, height: 44)
+                .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
+            
+            Image(systemName: activity.activity.activityIcon)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 22, height: 22)
+                .foregroundColor(.white)
+        }
     }
     
     private var contentView: some View {
-        Rectangle()
-            .fill(.white)
-            .frame(width: 250, height: 60)
-            .overlay(
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(activity.date.formattedJapaneseDate)
-                        .foregroundColor(.gray)
-                        .font(.caption)
-                    
-                    Text(activity.activity.activityName)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    if let quantity = activity.quantity {
-                        Text("数量: \(quantity)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    if let comment = activity.comment, !comment.isEmpty {
-                        Text(comment)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 8)
-            )
+        VStack(alignment: .leading, spacing: 4) {
+            Text(activity.activity.activityName)
+                .font(.headline)
+                .foregroundColor(.primary)
+            
+            if let quantity = activity.quantity {
+                Text("数量: \(quantity)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            if let comment = activity.comment, !comment.isEmpty {
+                Text(comment)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+            }
+        }
+        .padding(10)
+        .background(Color.white)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
 
 //==================================================//
 //  MARK: - Preview

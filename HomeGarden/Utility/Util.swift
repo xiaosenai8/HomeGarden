@@ -18,7 +18,7 @@ extension Date {
     var formattedJapaneseDate: String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy年M月d日"
+        formatter.dateFormat = "M/d"
         return formatter.string(from: self)
     }
 }

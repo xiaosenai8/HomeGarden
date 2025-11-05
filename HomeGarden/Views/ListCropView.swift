@@ -26,10 +26,18 @@ struct ListCropView: View {
         sort: [SortDescriptor(\Crop.orderIndex)]
     ) private var crops: [Crop]
     
-    @State private var isFormPresented = false       // 新規追加フォーム表示
-    @State private var isEditMode = false           // 編集モード
-    @State private var selectedCrop: Crop?          // 遷移先用
-    @State private var editingCrop: Crop?           // 編集対象
+    //==================================================//
+    //  MARK: - 状態管理
+    //==================================================//
+    @State private var isFormPresented = false       // 新規追加フォーム表示フラグ
+    @State private var isEditMode = false            // 並び替えモードフラグ
+    @State private var selectedCrop: Crop?           // 作業一覧画面へ遷移する作物
+    @State private var editingCrop: Crop?            // 編集対象の作物
+    
+    //==================================================//
+    //  MARK: - 定数
+    //==================================================//
+    private let emptyListTopPadding: CGFloat = 200   // 空リスト時の余白
     
     //==================================================//
     //  MARK: - Body
@@ -40,11 +48,11 @@ struct ListCropView: View {
                 headerView
                 cropListView
             }
-            // 編集フォームシート
+            // 編集フォームの表示
             .sheet(item: $editingCrop) { crop in
                 FormCropView(editingCrop: crop)
             }
-            // 新規追加フォームシート
+            // 新規作物追加フォーム
             .sheet(isPresented: $isFormPresented) {
                 FormCropView()
             }
@@ -61,34 +69,24 @@ struct ListCropView: View {
     }
     
     //==================================================//
-    //  MARK: - ヘッダー
+    //  MARK: - ヘッダー部分
     //==================================================//
     private var headerView: some View {
         HStack {
             Text("家庭菜園")
+                .foregroundColor(Color("FontColor"))
                 .font(.largeTitle.weight(.semibold))
             
             Spacer()
             
-            HStack(spacing: 12) {
-                
-                Button {
-                    withAnimation { isEditMode.toggle() }
-                } label: {
-                    Image(systemName: "arrow.up.and.down.text.horizontal")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(isEditMode ? .orange : .teal)
-                        .font(.system(size: 20, weight: .semibold))
-                }
-                
-//                Button {
-//                    isFormPresented = true
-//                } label: {
-//                    Image(systemName: "plus.app")
-//                        .symbolRenderingMode(.palette)
-//                        .foregroundStyle(.teal)
-//                        .font(.system(size: 25, weight: .semibold))
-//                }
+            // 並び替えモード切替ボタン
+            Button {
+                withAnimation { isEditMode.toggle() }
+            } label: {
+                Image(systemName: "arrow.up.and.down.text.horizontal")
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(isEditMode ? .orange : .teal)
+                    .font(.system(size: 20, weight: .semibold))
             }
         }
         .padding()
@@ -101,15 +99,8 @@ struct ListCropView: View {
         List {
             ForEach(crops) { crop in
                 cropRow(crop)
-//                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-//                        Button {
-//                            editingCrop = crop
-//                        } label: {
-//                            Label("編集", systemImage: "pencil")
-//                        }
-//                        .tint(.teal)
-//                    }
                     .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                        // アーカイブ操作
                         Button {
                             archiveCrop(crop)
                         } label: {
@@ -118,33 +109,32 @@ struct ListCropView: View {
                         .tint(.gray)
                     }
             }
+            // 並び替え処理
             .onMove(perform: moveCrop)
             
-            Button {
-                isFormPresented = true
-            } label: {
+            // 空リスト時の表示
+            if crops.isEmpty {
                 HStack {
                     Spacer()
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.teal)
-                        .font(.system(size: 22, weight: .bold))
-                    Text("新しい野菜を追加")
-                        .font(.headline)
-                        .foregroundColor(.teal)
+                    Image(systemName: "folder")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 50, weight: .thin))
                     Spacer()
                 }
-                .padding(.vertical, 12)
+                .padding(.top, emptyListTopPadding)
             }
-            .buttonStyle(.plain)
-            .listRowBackground(Color.clear)
-            .opacity(isEditMode ? 0 : 1)
             
+            // 作物追加ボタン
+            addCropButton
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .environment(\.editMode, .constant(isEditMode ? .active : .inactive))
     }
     
+    //==================================================//
+    //  MARK: - 作物行ビュー
+    //==================================================//
     private func cropRow(_ crop: Crop) -> some View {
         Button {
             guard !isEditMode else { return }
@@ -160,18 +150,48 @@ struct ListCropView: View {
     }
     
     //==================================================//
+    //  MARK: - 新規追加ボタン
+    //==================================================//
+    private var addCropButton: some View {
+        Button {
+            isFormPresented = true
+        } label: {
+            HStack {
+                Spacer()
+                Image(systemName: "plus.circle.fill")
+                    .foregroundStyle(.teal)
+                    .font(.system(size: 22, weight: .bold))
+                Text("新しい野菜を追加")
+                    .font(.headline)
+                    .foregroundColor(.teal)
+                Spacer()
+            }
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.plain)
+        .listRowBackground(Color.clear)
+        .opacity(isEditMode ? 0 : 1)
+        .listRowSeparator(.hidden)
+    }
+    
+    //==================================================//
     //  MARK: - リスト操作
     //==================================================//
     
+    /// 並び替え処理
     private func moveCrop(from source: IndexSet, to destination: Int) {
+        // 並び順を保持した配列を一時作成
         var sortedCrops = crops.sorted { $0.orderIndex < $1.orderIndex }
         sortedCrops.move(fromOffsets: source, toOffset: destination)
+        
+        // 新しい順番に基づいて orderIndex を更新
         for (index, crop) in sortedCrops.enumerated() {
             crop.orderIndex = index
         }
         try? modelContext.save()
     }
     
+    /// 指定された作物をアーカイブ化
     private func archiveCrop(_ crop: Crop) {
         crop.isArchived = true
         try? modelContext.save()
@@ -179,7 +199,7 @@ struct ListCropView: View {
 }
 
 //==================================================//
-//  MARK: - 作物行ビュー
+//  MARK: - 作物行コンポーネント
 //==================================================//
 private struct CropRowView: View {
     @Binding var isEditMode: Bool
@@ -187,6 +207,7 @@ private struct CropRowView: View {
     
     var body: some View {
         HStack {
+            // 作物アイコン
             Image(crop.icon.iconName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -194,12 +215,15 @@ private struct CropRowView: View {
                 .foregroundColor(crop.color.cropColor)
                 .padding(16)
             
+            // 作物名
             Text(crop.name)
+                .foregroundColor(Color("FontColor"))
                 .font(.headline.weight(.semibold))
                 .padding(.vertical, 2)
             
             Spacer()
             
+            // 右矢印（編集モードでは非表示）
             Image(systemName: "chevron.right")
                 .opacity(isEditMode ? 0 : 1)
                 .foregroundColor(crop.color.cropColor)
@@ -215,8 +239,12 @@ private struct CropRowView: View {
 //==================================================//
 //  MARK: - Preview
 //==================================================//
-#Preview {
+#Preview("Default") {
     ListCropView()
         .modelContainer(Crop.preview)
+}
+
+#Preview("Empty") {
+    ListCropView()
 }
 

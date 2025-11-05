@@ -29,16 +29,6 @@ struct PickerActivityTypeView: View {
             }
             .background(Color(.systemGray6)) // スクロール領域の背景
             .navigationTitle("作業を選択")
-//            .toolbar {
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button {
-//                        dismiss()
-//                    } label: {
-//                        Image(systemName: "xmark")
-//                    }
-//                }
-//
-//            }
         }
     }
     
