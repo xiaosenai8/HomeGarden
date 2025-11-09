@@ -93,6 +93,7 @@ struct FormActivityView: View {
                 }
             }
             .navigationTitle(editingActivity == nil ? "作業追加" : "作業保存")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -194,7 +195,8 @@ struct FormActivityView: View {
                 date: selectedDate,
                 activity: selectedActivity,
                 quantity: quantity,
-                comment: comment
+                comment: comment,
+                crop: crop
             )
             modelContext.insert(newActivity)
             crop.activities.append(newActivity)

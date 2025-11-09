@@ -34,7 +34,7 @@ class Crop {
     
     /// カラー（列挙型として扱う computed property）
     var color: CropColor {
-        get { CropColor(rawValue: colorValue) ?? .teal }
+        get { CropColor(rawValue: colorValue) ?? .green }
         set { colorValue = newValue.rawValue }
     }
     
@@ -42,13 +42,16 @@ class Crop {
     var iconValue: Int = CropIcon.tomato.rawValue
     
     /// 保存用のカラー値
-    var colorValue: Int = CropColor.teal.rawValue
+    var colorValue: Int = CropColor.green.rawValue
     
     /// 関連する作業のリスト
     @Relationship var activities: [Activity] = []
     
     /// アーカイブ済みかどうか
     var isArchived: Bool = false
+    
+    /// カスタムカラー
+    var customColorHex: String?
     
     //==================================================//
     //  MARK: - イニシャライザ
@@ -60,11 +63,12 @@ class Crop {
     ///   - name: 作物名
     ///   - icon: 作物アイコン
     ///   - color: 作物カラー
-    init(orderIndex: Int, name: String, icon: CropIcon, color: CropColor) {
+    init(orderIndex: Int, name: String, icon: CropIcon, color: CropColor, customColorHex: String? = nil) {
         self.orderIndex = orderIndex
         self.name = name
         self.iconValue = icon.rawValue
         self.colorValue = color.rawValue
+        self.customColorHex = customColorHex
     }
 }
 
@@ -83,7 +87,7 @@ extension Crop {
         )
         
         container.mainContext.insert(Crop(orderIndex: 1, name: "トマト", icon: .tomato, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 2, name: "ブロッコリー", icon: .broccoli, color: .teal))
+        container.mainContext.insert(Crop(orderIndex: 2, name: "ブロッコリー", icon: .broccoli, color: .green))
         container.mainContext.insert(Crop(orderIndex: 3, name: "にんじん", icon: .carrot, color: .green))
         container.mainContext.insert(Crop(orderIndex: 4, name: "たまねぎ", icon: .onion, color: .red))
         container.mainContext.insert(Crop(orderIndex: 5, name: "にんにく", icon: .garlic, color: .orange))

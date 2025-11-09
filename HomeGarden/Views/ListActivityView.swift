@@ -53,7 +53,6 @@ struct ListActivityView: View {
                     .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 3)
             }
             .padding()
-            .accessibilityLabel("新しい作業を追加")
         }
         //        .sheet(isPresented: $isFormPresented) {
         //            if let editingActivity {
@@ -75,14 +74,9 @@ struct ListActivityView: View {
     //  MARK: - ヘッダー
     //==================================================//
     private var headerView: some View {
-        HStack {
-            Text(crop.name)
-                .foregroundColor(Color("FontColor"))
-                .font(.largeTitle.weight(.semibold))
-            
-            Spacer()
-            
-        }
+        Text(crop.name)
+            .foregroundColor(Color("FontColor"))
+            .font(.largeTitle.weight(.semibold))
     }
     
     //==================================================//

@@ -72,24 +72,11 @@ struct ListCropView: View {
     //  MARK: - ヘッダー部分
     //==================================================//
     private var headerView: some View {
-        HStack {
-            Text("家庭菜園")
-                .foregroundColor(Color("FontColor"))
-                .font(.largeTitle.weight(.semibold))
-            
-            Spacer()
-            
-            // 並び替えモード切替ボタン
-            Button {
-                withAnimation { isEditMode.toggle() }
-            } label: {
-                Image(systemName: "arrow.up.and.down.text.horizontal")
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(isEditMode ? .orange : .teal)
-                    .font(.system(size: 20, weight: .semibold))
-            }
-        }
-        .padding()
+        
+        Text("家庭菜園")
+            .foregroundColor(Color("FontColor"))
+            .font(.largeTitle.weight(.semibold))
+        
     }
     
     //==================================================//
@@ -212,7 +199,7 @@ private struct CropRowView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 30, height: 30)
-                .foregroundColor(crop.color.cropColor)
+                .foregroundColor(crop.displayColor)
                 .padding(16)
             
             // 作物名
@@ -226,7 +213,7 @@ private struct CropRowView: View {
             // 右矢印（編集モードでは非表示）
             Image(systemName: "chevron.right")
                 .opacity(isEditMode ? 0 : 1)
-                .foregroundColor(crop.color.cropColor)
+                .foregroundColor(crop.displayColor)
                 .font(.system(size: 14, weight: .medium))
                 .padding(16)
         }

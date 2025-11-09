@@ -38,6 +38,9 @@ class Activity: Identifiable {
     /// 作業コメント（任意）
     @Attribute var comment: String?
     
+    /// 作物との紐付け
+    @Relationship var crop: Crop?
+    
     //==================================================//
     //  MARK: - イニシャライザ
     //==================================================//
@@ -48,11 +51,11 @@ class Activity: Identifiable {
     ///   - type: 作業タイプ
     ///   - quantity: 作業数量（任意）
     ///   - comment: 作業コメント（任意）
-    init(date: Date = Date(), activity: ActivityType, quantity: Int? = nil, comment: String? = nil) {
+    init(date: Date = Date(), activity: ActivityType, quantity: Int? = nil, comment: String? = nil, crop: Crop? = nil) {
         self.date = date
         self.activityValue = activity.rawValue
         self.quantity = quantity
         self.comment = comment
+        self.crop = crop
     }
 }
-

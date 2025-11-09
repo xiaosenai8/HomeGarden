@@ -27,8 +27,11 @@ struct FormCropView: View {
     @State private var navigationPath = NavigationPath()
     @State private var cropName: String = ""
     @State private var selectedIcon: CropIcon = .tomato
-    @State private var selectedColor: CropColor = .teal
+    @State private var selectedColor: CropColor = .green
     @State private var showDeleteAlert: Bool = false
+    @State private var customColor: Color = .black
+    @State private var showColorPicker = false
+    @State private var showInlineColorPicker = false
     
     //==================================================//
     //  MARK: - Body
@@ -60,18 +63,37 @@ struct FormCropView: View {
                 
                 // カラー選択
                 Section(header: Text("カラー")) {
-                    Picker("カラー", selection: $selectedColor) {
-                        ForEach(CropColor.allCases) { color in
-                            Image(systemName: "circle.fill")
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(color.cropColor)
-                                .tag(color)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 16) {
+                            
+                            ForEach(CropColor.allCases) { color in
+                                if color != .custom {
+                                    Circle()
+                                        .fill(color.cropColor)
+                                        .frame(width: 34, height: 34)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.blue, lineWidth: selectedColor == color ? 3 : 0)
+                                        )
+                                        .onTapGesture {
+                                            selectedColor = color
+                                        }
+                                }
+                            }
+                            
+                            ColorPicker("", selection: $customColor)
+                                .labelsHidden()
+                                .frame(width: 40, height: 40)
+                                .onChange(of: customColor) { oldValue, newValue in
+                                    selectedColor = .custom
+                                }
                         }
+                        .padding(.vertical, 8)
                     }
-                    .pickerStyle(.segmented)
                 }
             }
             .navigationTitle(editingCrop == nil ? "野菜の追加" : "野菜の編集")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -97,36 +119,36 @@ struct FormCropView: View {
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             
-//            Button {
-//                dismiss()
-//            } label: {
-//                Text("キャンセル")
-//                    .font(.title2.weight(.medium))
-//                    .frame(maxWidth: .infinity)
-//            }
-//            .buttonStyle(.bordered)
-//            .controlSize(.large)
-//            .buttonBorderShape(.roundedRectangle)
-//            
-//            if let editingCrop = editingCrop {
-//                Button(role: .destructive) {
-//                    showDeleteAlert = true
-//                } label: {
-//                    Text("削除")
-//                        .font(.title2.weight(.medium))
-//                        .frame(maxWidth: .infinity)
-//                }
-//                .buttonStyle(.borderedProminent)
-//                .controlSize(.large)
-//                .buttonBorderShape(.roundedRectangle)
-//                .tint(.red)
-//                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
-//                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
-//                    Button("キャンセル", role: .cancel) {}
-//                } message: {
-//                    Text("この操作は取り消せません。")
-//                }
-//            }
+            //            Button {
+            //                dismiss()
+            //            } label: {
+            //                Text("キャンセル")
+            //                    .font(.title2.weight(.medium))
+            //                    .frame(maxWidth: .infinity)
+            //            }
+            //            .buttonStyle(.bordered)
+            //            .controlSize(.large)
+            //            .buttonBorderShape(.roundedRectangle)
+            //
+            //            if let editingCrop = editingCrop {
+            //                Button(role: .destructive) {
+            //                    showDeleteAlert = true
+            //                } label: {
+            //                    Text("削除")
+            //                        .font(.title2.weight(.medium))
+            //                        .frame(maxWidth: .infinity)
+            //                }
+            //                .buttonStyle(.borderedProminent)
+            //                .controlSize(.large)
+            //                .buttonBorderShape(.roundedRectangle)
+            //                .tint(.red)
+            //                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
+            //                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
+            //                    Button("キャンセル", role: .cancel) {}
+            //                } message: {
+            //                    Text("この操作は取り消せません。")
+            //                }
+            //            }
         }
         .padding()
         .onAppear(perform: initializeForm)
@@ -149,32 +171,55 @@ struct FormCropView: View {
     //  MARK: - 保存処理
     //==================================================//
     private func saveCrop() {
+        // 編集中か新規作成かを判定
         if let editingCrop = editingCrop {
+            // 既存作物の更新
             editingCrop.name = cropName
             editingCrop.icon = selectedIcon
             editingCrop.color = selectedColor
+            
+            // カスタム色選択時は Hex 保存
+            if selectedColor == .custom {
+                editingCrop.customColorHex = customColor.hexString
+            } else {
+                editingCrop.customColorHex = nil
+            }
+            
         } else {
+            // 新規作成時：次の orderIndex を決定
             let descriptor = FetchDescriptor<Crop>(sortBy: [SortDescriptor(\.orderIndex)])
             let crops = (try? modelContext.fetch(descriptor)) ?? []
             let newOrderIndex = (crops.map { $0.orderIndex }.max() ?? -1) + 1
             
+            // 新しい Crop インスタンスを作成
             let newCrop = Crop(
                 orderIndex: newOrderIndex,
                 name: cropName,
                 icon: selectedIcon,
                 color: selectedColor
             )
+            
+            // カスタム色選択時は Hex 保存
+            if selectedColor == .custom {
+                newCrop.customColorHex = customColor.hexString
+            }
+            
+            // モデルに挿入
             modelContext.insert(newCrop)
         }
         
+        // 保存処理
         do {
             try modelContext.save()
             print("保存成功: \(cropName)")
         } catch {
             print("保存失敗: \(error)")
         }
+        
+        // 画面を閉じる
         dismiss()
     }
+
     
     //==================================================//
     //  MARK: - 削除処理
@@ -183,6 +228,22 @@ struct FormCropView: View {
         modelContext.delete(crop)
         try? modelContext.save()
         dismiss()
+    }
+}
+
+extension View {
+    func colorPickerSheet(isPresented: Binding<Bool>, color: Binding<Color>) -> some View {
+        self.sheet(isPresented: isPresented) {
+            VStack {
+                Text("色を選択")
+                    .font(.headline)
+                ColorPicker("", selection: color)
+                    .labelsHidden()
+                    .padding()
+                Spacer()
+            }
+            .presentationDetents([.height(200)])
+        }
     }
 }
 

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 
 //==================================================//
 //  MARK: - 列挙型
@@ -26,12 +27,11 @@ enum CropColor: Int, Codable, CaseIterable, Identifiable {
     //  MARK: - ケース
     //==================================================//
     
-    case teal      = 1
-    case green     = 2
-    case red       = 3
-    case brown     = 4
-    case orange    = 5
-    case yellow    = 6
+    case green      = 1
+    case orange     = 2
+    case yellow     = 3
+    case red        = 4
+    case custom     = 5
 }
 
 //==================================================//
@@ -43,12 +43,11 @@ extension CropColor {
     /// SwiftUI の Color に変換
     var cropColor: Color {
         switch self {
-        case .teal:   return .teal
         case .green:  return .green
-        case .red:    return .red
-        case .brown:  return .brown
         case .orange: return .orange
         case .yellow: return .yellow
+        case .red:    return .red
+        case .custom: return .clear
         }
     }
 }
