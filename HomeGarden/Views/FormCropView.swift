@@ -22,13 +22,12 @@ struct FormCropView: View {
     //==================================================//
     //  MARK: - 入力データ
     //==================================================//
-    var editingCrop: Crop?   // 編集対象のCrop
+    var editingCrop: Crop?
     
     @State private var navigationPath = NavigationPath()
     @State private var cropName: String = ""
     @State private var selectedIcon: CropIcon = .tomato
     @State private var selectedColor: CropColor = .green
-    @State private var showDeleteAlert: Bool = false
     @State private var customColor: Color = .black
     @State private var showColorPicker = false
     @State private var showInlineColorPicker = false
@@ -46,21 +45,7 @@ struct FormCropView: View {
                         .textFieldStyle(.roundedBorder)
                         .font(.largeTitle.weight(.light))
                 }
-                
-                // アイコン選択
-                Section(header: Text("アイコン")) {
-                    NavigationLink {
-                        PickerCropIconView(selectedIcon: $selectedIcon)
-                    } label: {
-                        HStack {
-                            Image(selectedIcon.iconName)
-                                .resizable()
-                                .frame(width: 30, height: 30)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-                
+                                
                 // カラー選択
                 Section(header: Text("カラー")) {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -91,6 +76,21 @@ struct FormCropView: View {
                         .padding(.vertical, 8)
                     }
                 }
+                
+                // アイコン選択
+                Section(header: Text("アイコン")) {
+                    NavigationLink {
+                        PickerCropIconView(selectedIcon: $selectedIcon)
+                    } label: {
+                        HStack {
+                            Image(selectedIcon.iconName)
+                                .resizable()
+                                .frame(width: 30, height: 30)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
             }
             .navigationTitle(editingCrop == nil ? "野菜の追加" : "野菜の編集")
             .navigationBarTitleDisplayMode(.inline)
@@ -118,37 +118,6 @@ struct FormCropView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
-            
-            //            Button {
-            //                dismiss()
-            //            } label: {
-            //                Text("キャンセル")
-            //                    .font(.title2.weight(.medium))
-            //                    .frame(maxWidth: .infinity)
-            //            }
-            //            .buttonStyle(.bordered)
-            //            .controlSize(.large)
-            //            .buttonBorderShape(.roundedRectangle)
-            //
-            //            if let editingCrop = editingCrop {
-            //                Button(role: .destructive) {
-            //                    showDeleteAlert = true
-            //                } label: {
-            //                    Text("削除")
-            //                        .font(.title2.weight(.medium))
-            //                        .frame(maxWidth: .infinity)
-            //                }
-            //                .buttonStyle(.borderedProminent)
-            //                .controlSize(.large)
-            //                .buttonBorderShape(.roundedRectangle)
-            //                .tint(.red)
-            //                .alert("この野菜を削除しますか？", isPresented: $showDeleteAlert) {
-            //                    Button("削除", role: .destructive) { deleteCrop(editingCrop) }
-            //                    Button("キャンセル", role: .cancel) {}
-            //                } message: {
-            //                    Text("この操作は取り消せません。")
-            //                }
-            //            }
         }
         .padding()
         .onAppear(perform: initializeForm)

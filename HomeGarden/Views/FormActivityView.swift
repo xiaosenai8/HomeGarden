@@ -121,19 +121,8 @@ struct FormActivityView: View {
             .controlSize(.large)
             .buttonBorderShape(.roundedRectangle)
             
-//            // キャンセル
-//            Button {
-//                dismiss()
-//            } label: {
-//                Text("キャンセル")
-//                    .font(.title2.weight(.medium))
-//                    .frame(maxWidth: .infinity)
-//            }
-//            .buttonStyle(.bordered)
-//            .controlSize(.large)
-//            .buttonBorderShape(.roundedRectangle)
             
-//            // 削除（編集モード時のみ表示）
+//          // 削除（編集モード時のみ表示）
 //            if let editingActivity = editingActivity {
 //                Button(role: .destructive) {
 //                    showDeleteAlert = true
@@ -217,58 +206,6 @@ struct FormActivityView: View {
         try? modelContext.save()
         dismiss()
     }
-    
-    //==================================================//
-    // MARK: - グリッド全体ビュー
-    //==================================================//
-//    struct ActivityTypeGrid: View {
-//        @Binding var selectedType: ActivityType
-//        
-//        private let columns = [
-//            GridItem(.flexible()),
-//            GridItem(.flexible()),
-//            GridItem(.flexible())
-//        ]
-//        
-//        var body: some View {
-//            LazyVGrid(columns: columns, spacing: 16) {
-//                ForEach(ActivityType.allCases) { type in
-//                    ActivityTypeButton(type: type, selectedType: $selectedType)
-//                }
-//            }
-//        }
-//    }
-    //==================================================//
-    // MARK: - 個別アイテムビュー
-    //==================================================//
-//    struct ActivityTypeButton: View {
-//        let type: ActivityType
-//        @Binding var selectedType: ActivityType
-//        
-//        var body: some View {
-//            Button {
-//                selectedType = type
-//            } label: {
-//                VStack(spacing: 8) {
-//                    Image(systemName: type.activityIcon)
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: 30, height: 30)
-//                        .foregroundColor(selectedType == type ? .white : .teal)
-//                    Text(type.activityName)
-//                        .font(.footnote)
-//                        .foregroundColor(selectedType == type ? .white : .primary)
-//                }
-//                .frame(maxWidth: .infinity, minHeight: 70)
-//                .padding(8)
-//                .background(
-//                    RoundedRectangle(cornerRadius: 12)
-//                        .fill(selectedType == type ? Color.teal : Color.gray.opacity(0.15))
-//                )
-//            }
-//            .buttonStyle(.plain)
-//        }
-//    }
 }
 
 
@@ -276,7 +213,7 @@ struct FormActivityView: View {
 //  MARK: - Preview
 //==================================================//
 #Preview {
-    let sampleCrop = Crop(orderIndex: 0, name: "トマト", icon: .tomato, color: .red)
-    FormActivityView(crop: sampleCrop)
+    let data = PreviewData.listActivityView
+    FormActivityView(crop: data.crop)
 }
 

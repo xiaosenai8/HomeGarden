@@ -39,7 +39,7 @@ class Activity: Identifiable {
     @Attribute var comment: String?
     
     /// 作物との紐付け
-    @Relationship var crop: Crop?
+    @Relationship(deleteRule: .cascade) var crop: Crop?
     
     //==================================================//
     //  MARK: - イニシャライザ

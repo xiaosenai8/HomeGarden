@@ -72,27 +72,3 @@ class Crop {
     }
 }
 
-//==================================================//
-//  MARK: - プレビュー用拡張
-//==================================================//
-
-extension Crop {
-    
-    /// プレビュー用の ModelContainer
-    @MainActor
-    static var preview: ModelContainer {
-        let container = try! ModelContainer(
-            for: Crop.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-        )
-        
-        container.mainContext.insert(Crop(orderIndex: 1, name: "トマト", icon: .tomato, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 2, name: "ブロッコリー", icon: .broccoli, color: .green))
-        container.mainContext.insert(Crop(orderIndex: 3, name: "にんじん", icon: .carrot, color: .green))
-        container.mainContext.insert(Crop(orderIndex: 4, name: "たまねぎ", icon: .onion, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 5, name: "にんにく", icon: .garlic, color: .orange))
-        
-        return container
-    }
-}
-

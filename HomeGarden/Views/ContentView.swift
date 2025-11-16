@@ -47,10 +47,10 @@ struct ContentView: View {
             //==================================================//
             SettingView()
                 .tabItem {
-                    Label("ホーム", systemImage: "person")
+                    Label("設定", systemImage: "person")
                 }
         }
-        .accentColor(.teal) // タブ選択時のテーマカラー
+        .accentColor(.teal)
     }
 }
 
@@ -60,11 +60,6 @@ struct ContentView: View {
 
 #Preview("Sample List") {
     ContentView()
-        .modelContainer(Crop.preview)
-}
-
-#Preview("Empty List") {
-    ContentView()
-        .modelContainer(for: Crop.self, inMemory: true)
+        .modelContainer(PreviewData.cropsOnly)
 }
 

@@ -86,15 +86,6 @@ struct ListCropView: View {
         List {
             ForEach(crops) { crop in
                 cropRow(crop)
-                    .swipeActions(edge: .leading, allowsFullSwipe: false) {
-                        // アーカイブ操作
-                        Button {
-                            archiveCrop(crop)
-                        } label: {
-                            Label("アーカイブ", systemImage: "archivebox")
-                        }
-                        .tint(.gray)
-                    }
             }
             // 並び替え処理
             .onMove(perform: moveCrop)
@@ -165,7 +156,7 @@ struct ListCropView: View {
     //  MARK: - リスト操作
     //==================================================//
     
-    /// 並び替え処理
+    // 並び替え処理
     private func moveCrop(from source: IndexSet, to destination: Int) {
         // 並び順を保持した配列を一時作成
         var sortedCrops = crops.sorted { $0.orderIndex < $1.orderIndex }
@@ -175,12 +166,6 @@ struct ListCropView: View {
         for (index, crop) in sortedCrops.enumerated() {
             crop.orderIndex = index
         }
-        try? modelContext.save()
-    }
-    
-    /// 指定された作物をアーカイブ化
-    private func archiveCrop(_ crop: Crop) {
-        crop.isArchived = true
         try? modelContext.save()
     }
 }
@@ -228,7 +213,7 @@ private struct CropRowView: View {
 //==================================================//
 #Preview("Default") {
     ListCropView()
-        .modelContainer(Crop.preview)
+        .modelContainer(PreviewData.cropsOnly)
 }
 
 #Preview("Empty") {

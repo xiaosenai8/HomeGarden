@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PickerCropIconView: View {
+    
     // 親から選択状態を受け取る（双方向バインディング）
     @Binding var selectedIcon: CropIcon
     @Environment(\.dismiss) private var dismiss
@@ -64,7 +65,6 @@ struct PickerCropIconView: View {
 //  MARK: - Preview
 //==================================================//
 #Preview {
-    // Binding を作るには .constant を使う
     PickerCropIconView(selectedIcon: .constant(.tomato))
 }
 

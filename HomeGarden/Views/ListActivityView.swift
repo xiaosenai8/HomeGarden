@@ -5,12 +5,13 @@
 //  説明  : 作物(Crop)に紐づく作業(Activity)一覧を表示し、追加・編集を行う画面
 //==================================================//
 
+//==================================================//
+//  MARK: - ListActivityView.swift
+//==================================================//
+
 import SwiftUI
 import SwiftData
 
-//==================================================//
-//  MARK: - 作業一覧ビュー
-//==================================================//
 struct ListActivityView: View {
     
     //==================================================//
@@ -20,11 +21,17 @@ struct ListActivityView: View {
     @Environment(\.modelContext) private var modelContext
     
     //==================================================//
-    //  MARK: - 入力データ
+    //  MARK: - Inputs
     //==================================================//
-    let crop: Crop                                 // 対象の作物
-    @State private var isFormPresented = false     // フォーム表示フラグ
-    @State private var editingActivity: Activity?  // 編集対象のActivity
+    let crop: Crop
+    @State private var isFormPresented = false
+    @State private var editingActivity: Activity?
+    
+    // 設定シート&確認アラート
+    @State private var showSettingsSheet = false
+    @State private var showArchiveAlert = false
+    @State private var showDeleteAlert = false
+    @State private var isEditCropPresented = false
     
     //==================================================//
     //  MARK: - Body
@@ -42,6 +49,7 @@ struct ListActivityView: View {
             }
             .padding(.horizontal)
             
+            // +ボタン
             Button {
                 isFormPresented = true
             } label: {
@@ -54,29 +62,113 @@ struct ListActivityView: View {
             }
             .padding()
         }
-        //        .sheet(isPresented: $isFormPresented) {
-        //            if let editingActivity {
-        //                FormActivityView(crop: crop, editingActivity: editingActivity)
-        //            } else {
-        //                FormActivityView(crop: crop)
-        //            }
-        //        }
+        
+        // 作業追加フォーム（新規）
         .sheet(isPresented: $isFormPresented) {
             FormActivityView(crop: crop)
         }
+        
+        // 作業編集フォーム（編集）
         .sheet(item: $editingActivity) { activity in
             FormActivityView(crop: crop, editingActivity: activity)
         }
         
+        .sheet(isPresented: $isEditCropPresented) {
+            FormCropView(editingCrop: crop)
+        }
+        
+        //==================================================//
+        //  設定シート（下から出る）
+        //==================================================//
+        .sheet(isPresented: $showSettingsSheet) {
+            VStack(spacing: 0) {
+                Text("設定")
+                    .font(.headline)
+                    .padding(.top, 20)
+                
+                List {
+                    Button {
+                        showSettingsSheet = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            isEditCropPresented = true
+                        }
+                    } label: {
+                        Text("編集")
+                    }
+                    
+                    Button {
+                        showSettingsSheet = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            showArchiveAlert = true
+                        }
+                    } label: {
+                        Text("アーカイブ")
+                    }
+                    
+                    Button(role: .destructive) {
+                        showSettingsSheet = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                            showDeleteAlert = true
+                        }
+                    } label: {
+                        Text("削除")
+                    }
+                }
+                .listStyle(.insetGrouped)
+                
+                Button("キャンセル") {
+                    showSettingsSheet = false
+                }
+                .padding()
+            }
+            .presentationDetents([.medium])   // 下から中サイズ
+            .presentationDragIndicator(.visible)
+        }
+        
+        //==================================================//
+        //  アーカイブ確認アラート
+        //==================================================//
+        .alert("アーカイブしますか？", isPresented: $showArchiveAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("OK") {
+                archiveCrop()
+            }
+        } message: {
+            Text("\(crop.name) をアーカイブします。")
+        }
+        
+        //==================================================//
+        //  削除確認アラート
+        //==================================================//
+        .alert("削除しますか？", isPresented: $showDeleteAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("OK", role: .destructive) {
+                deleteCrop()
+            }
+        } message: {
+            Text("\(crop.name) を完全に削除します。")
+        }
     }
     
     //==================================================//
-    //  MARK: - ヘッダー
+    //  MARK: - Header（設定ボタン付き）
     //==================================================//
     private var headerView: some View {
-        Text(crop.name)
-            .foregroundColor(Color("FontColor"))
-            .font(.largeTitle.weight(.semibold))
+        HStack {
+            Text(crop.name)
+                .foregroundColor(Color("FontColor"))
+                .font(.largeTitle.weight(.semibold))
+            
+            Spacer()
+            
+            Button {
+                showSettingsSheet = true
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title2)
+                    .foregroundColor(.primary)
+            }
+        }
     }
     
     //==================================================//
@@ -90,7 +182,6 @@ struct ListActivityView: View {
             .opacity(0.9)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal)
-            .font(.largeTitle.weight(.semibold))
     }
     
     //==================================================//
@@ -107,7 +198,26 @@ struct ListActivityView: View {
         }
         .scrollContentBackground(.hidden)
     }
+    
+    //==================================================//
+    //  MARK: - アーカイブ処理
+    //==================================================//
+    private func archiveCrop() {
+        crop.isArchived = true
+        try? modelContext.save()
+        dismiss()
+    }
+    
+    //==================================================//
+    //  MARK: - 削除処理
+    //==================================================//
+    private func deleteCrop() {
+        modelContext.delete(crop)
+        try? modelContext.save()
+        dismiss()
+    }
 }
+
 
 //==================================================//
 //  MARK: - Activity 行ビュー
@@ -119,82 +229,60 @@ private struct ActivityRow: View {
     
     var body: some View {
         HStack {
-            dateView
-            iconView
-            contentView
+            Text(activity.date.formattedJapaneseDate)
+            
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(crop.color.cropColor)
+                    .frame(width: 44, height: 44)
+                    .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
+                
+                Image(systemName: activity.activity.activityIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 22, height: 22)
+                    .foregroundColor(.white)
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(activity.activity.activityName)
+                    .font(.headline)
+                
+                if let quantity = activity.quantity {
+                    Text("数量: \(quantity)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                if let comment = activity.comment, !comment.isEmpty {
+                    Text(comment)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .padding(10)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .contentShape(Rectangle())
         .onTapGesture {
             onTap?()
         }
     }
-    private var dateView: some View {
-        Text(activity.date.formattedJapaneseDate)
-    }
-    
-    private var iconView: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(crop.color.cropColor)
-                .frame(width: 44, height: 44)
-                .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
-            
-            Image(systemName: activity.activity.activityIcon)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 22, height: 22)
-                .foregroundColor(.white)
-        }
-    }
-    
-    private var contentView: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(activity.activity.activityName)
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            if let quantity = activity.quantity {
-                Text("数量: \(quantity)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            if let comment = activity.comment, !comment.isEmpty {
-                Text(comment)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-            }
-        }
-        .padding(10)
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
 }
+
 
 
 //==================================================//
 //  MARK: - Preview
 //==================================================//
 #Preview {
-    let container = try! ModelContainer(
-        for: Crop.self, Activity.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-    let context = container.mainContext
-    
-    let sampleCrop = Crop(orderIndex: 0, name: "トマト", icon: .tomato, color: .red)
-    let sampleActivity1 = Activity(date: Date(), activity: .watering, quantity: 3)
-    let sampleActivity2 = Activity(date: Date().addingTimeInterval(-86400 * 2), activity: .watering, quantity: nil)
-    sampleCrop.activities = [sampleActivity1, sampleActivity2]
-    
-    context.insert(sampleCrop)
-    context.insert(sampleActivity1)
-    context.insert(sampleActivity2)
-    
-    return ListActivityView(crop: sampleCrop)
-        .modelContainer(container)
+    let data = PreviewData.listActivityView
+    return ListActivityView(crop: data.crop)
+        .modelContainer(data.container)
 }
+
 
