@@ -27,14 +27,6 @@ struct SettingView: View {
             List {
                 
                 //===========================
-                //  表示設定（アーカイブ）
-                //===========================
-                Section("表示設定") {
-                    Toggle("アーカイブを表示する", isOn: $showArchived)
-                }
-                
-                
-                //===========================
                 //  アプリ情報
                 //===========================
                 Section("アプリ情報") {
@@ -47,12 +39,6 @@ struct SettingView: View {
                     }
                     
                     //---- 隠しコマンド ----//
-                    HStack {
-                        Text("おまけ設定")
-                        Spacer()
-                        Text("？？？")
-                            .foregroundStyle(.secondary)
-                    }
                     .contentShape(Rectangle())
                     .onTapGesture {
                         secretCounter += 1
@@ -70,16 +56,17 @@ struct SettingView: View {
                 Section("リンク") {
                     
                     Button("Q&A") {
-                        openWeb("https://example.com/qa")
+                        if let url = urlFromInfo("QA") {
+                            openWeb(url.absoluteString)
+                        }
                     }
                     
                     Button("お問い合わせフォーム") {
-                        openWeb("https://example.com/contact")
+                        if let url = urlFromInfo("Contact") {
+                            openWeb(url.absoluteString)
+                        }
                     }
-                    
-                    Button("お知らせ") {
-                        openWeb("https://example.com/news")
-                    }
+
                 }
             }
             .navigationTitle("設定")
@@ -110,6 +97,18 @@ struct SettingView: View {
             webViewURL = url
             showWebView = true
         }
+    }
+    
+    //=========================================
+    // MARK: - WebURL読込処理
+    //=========================================
+    private func urlFromInfo(_ key: String) -> URL? {
+        guard let dict = Bundle.main.object(forInfoDictionaryKey: "WebLinks") as? [String: String],
+              let urlString = dict[key],
+              let url = URL(string: urlString) else {
+            return nil
+        }
+        return url
     }
 }
 

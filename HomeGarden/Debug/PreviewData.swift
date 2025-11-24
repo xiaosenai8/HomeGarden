@@ -28,9 +28,9 @@ struct PreviewData {
         let context = container.mainContext
         
         // --- 作物を作成 ---
-        let tomato = Crop(orderIndex: 1, name: "トマト", icon: .tomato, color: .red)
-        let broccoli = Crop(orderIndex: 2, name: "ブロッコリー", icon: .broccoli, color: .green)
-        let carrot = Crop(orderIndex: 3, name: "にんじん", icon: .carrot, color: .green)
+        let tomato = Crop(orderIndex: 1, name: "トマト", unit: .piece, color: .red, icon: .tomato)
+        let broccoli = Crop(orderIndex: 2, name: "ブロッコリー", unit: .piece, color: .green, icon: .broccoli)
+        let carrot = Crop(orderIndex: 3, name: "にんじん", unit: .piece, color: .green, icon: .carrot)
         
         context.insert(tomato)
         context.insert(broccoli)
@@ -63,11 +63,11 @@ struct PreviewData {
         )
         _ = container.mainContext
         
-        container.mainContext.insert(Crop(orderIndex: 1, name: "トマト", icon: .tomato, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 2, name: "ブロッコリー", icon: .broccoli, color: .green))
-        container.mainContext.insert(Crop(orderIndex: 3, name: "にんじん", icon: .carrot, color: .green))
-        container.mainContext.insert(Crop(orderIndex: 4, name: "たまねぎ", icon: .onion, color: .red))
-        container.mainContext.insert(Crop(orderIndex: 5, name: "にんにく", icon: .garlic, color: .orange))
+        container.mainContext.insert(Crop(orderIndex: 1, name: "トマト", unit: .piece, color: .red, icon: .tomato))
+        container.mainContext.insert(Crop(orderIndex: 2, name: "ブロッコリー", unit: .piece, color: .green, icon: .broccoli))
+        container.mainContext.insert(Crop(orderIndex: 3, name: "にんじん", unit: .piece, color: .green, icon: .carrot))
+        container.mainContext.insert(Crop(orderIndex: 4, name: "たまねぎ", unit: .piece, color: .red, icon: .onion))
+        container.mainContext.insert(Crop(orderIndex: 5, name: "にんにく", unit: .piece, color: .orange, icon: .garlic))
         
         return container
     }
@@ -82,7 +82,7 @@ struct PreviewData {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         container.mainContext.insert(
-            Crop(orderIndex: 1, name: "トマト", icon: .tomato, color: .red)
+            Crop(orderIndex: 1, name: "トマト", unit: .piece, color: .red, icon: .tomato)
         )
         return container
     }
@@ -116,9 +116,8 @@ struct PreviewData {
             // --- 対象の作物（トマト） ---
             let tomato = Crop(
                 orderIndex: 1,
-                name: "トマト",
-                icon: .tomato,
-                color: .red
+                name: "トマト", unit: .piece,
+                color: .red, icon: .tomato
             )
             context.insert(tomato)
             
@@ -164,7 +163,7 @@ struct PreviewData {
             )
             let context = container.mainContext
             
-            let crop = Crop(orderIndex: 0, name: "トマト", icon: .tomato, color: .red)
+            let crop = Crop(orderIndex: 0, name: "トマト", unit: .piece, color: .red, icon: .tomato)
             
             let act1 = Activity(
                 date: Date(),

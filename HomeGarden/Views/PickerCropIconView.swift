@@ -11,6 +11,9 @@ struct PickerCropIconView: View {
     
     // 親から選択状態を受け取る（双方向バインディング）
     @Binding var selectedIcon: CropIcon
+    @Binding var selectedColor: CropColor
+    @Binding var customColor: Color
+    
     @Environment(\.dismiss) private var dismiss
     
     // グリッド設定
@@ -43,10 +46,13 @@ struct PickerCropIconView: View {
         } label: {
             VStack(spacing: 8) {
                 Image(icon.iconName)
+                    .renderingMode(.template)
                     .resizable()
                     .frame(width: 35, height: 35)
-                    .foregroundColor(Color.red)
-                    .opacity(0.8)
+                    .foregroundStyle(
+                        selectedColor == .custom ? customColor : selectedColor.cropColor
+                    )
+                    .opacity(0.9)
             }
             .frame(width: 70, height: 70)
             .background(Color.white)
@@ -65,7 +71,11 @@ struct PickerCropIconView: View {
 //  MARK: - Preview
 //==================================================//
 #Preview {
-    PickerCropIconView(selectedIcon: .constant(.tomato))
+    PickerCropIconView(
+        selectedIcon: .constant(.tomato),
+        selectedColor: .constant(.green),
+        customColor: .constant(.pink)
+    )
 }
 
 

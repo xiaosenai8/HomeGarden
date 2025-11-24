@@ -28,6 +28,7 @@ struct FormCropView: View {
     @State private var cropName: String = ""
     @State private var selectedIcon: CropIcon = .tomato
     @State private var selectedColor: CropColor = .green
+    @State private var selectedUnit: CropUnit = .piece
     @State private var customColor: Color = .black
     @State private var showColorPicker = false
     @State private var showInlineColorPicker = false
@@ -45,17 +46,28 @@ struct FormCropView: View {
                         .textFieldStyle(.roundedBorder)
                         .font(.largeTitle.weight(.light))
                 }
+                
+                // 単位選択
+                Section(header: Text("単位")) {
+                    Picker("", selection: $selectedUnit) {
+                        ForEach(CropUnit.allCases) { unit in
+                            Text(unit.unitName).tag(unit)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
                                 
                 // カラー選択
                 Section(header: Text("カラー")) {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 16) {
+                        HStack(spacing: 15) {
                             
                             ForEach(CropColor.allCases) { color in
                                 if color != .custom {
                                     Circle()
                                         .fill(color.cropColor)
-                                        .frame(width: 34, height: 34)
+                                        .frame(width: 30, height: 30)
                                         .overlay(
                                             Circle()
                                                 .stroke(Color.blue, lineWidth: selectedColor == color ? 3 : 0)
@@ -73,19 +85,27 @@ struct FormCropView: View {
                                     selectedColor = .custom
                                 }
                         }
-                        .padding(.vertical, 8)
+                        .padding(.horizontal, 10)
                     }
                 }
                 
                 // アイコン選択
                 Section(header: Text("アイコン")) {
                     NavigationLink {
-                        PickerCropIconView(selectedIcon: $selectedIcon)
+                        PickerCropIconView(
+                            selectedIcon: $selectedIcon,
+                            selectedColor: $selectedColor,
+                            customColor: $customColor
+                        )
                     } label: {
                         HStack {
                             Image(selectedIcon.iconName)
+                                .renderingMode(.template)
                                 .resizable()
                                 .frame(width: 30, height: 30)
+                                .foregroundStyle(
+                                    selectedColor == .custom ? customColor : selectedColor.cropColor
+                                )
                         }
                         .padding(.vertical, 4)
                     }
@@ -132,8 +152,9 @@ struct FormCropView: View {
     private func initializeForm() {
         guard let editingCrop = editingCrop else { return }
         cropName = editingCrop.name
-        selectedIcon = editingCrop.icon
+        selectedUnit = editingCrop.unit
         selectedColor = editingCrop.color
+        selectedIcon = editingCrop.icon
     }
     
     //==================================================//
@@ -144,8 +165,9 @@ struct FormCropView: View {
         if let editingCrop = editingCrop {
             // 既存作物の更新
             editingCrop.name = cropName
-            editingCrop.icon = selectedIcon
+            editingCrop.unit = selectedUnit
             editingCrop.color = selectedColor
+            editingCrop.icon = selectedIcon
             
             // カスタム色選択時は Hex 保存
             if selectedColor == .custom {
@@ -164,8 +186,9 @@ struct FormCropView: View {
             let newCrop = Crop(
                 orderIndex: newOrderIndex,
                 name: cropName,
-                icon: selectedIcon,
-                color: selectedColor
+                unit: selectedUnit,
+                color: selectedColor,
+                icon: selectedIcon
             )
             
             // カスタム色選択時は Hex 保存

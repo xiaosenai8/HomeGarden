@@ -96,15 +96,6 @@ struct ListActivityView: View {
                         Text("編集")
                     }
                     
-                    Button {
-                        showSettingsSheet = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                            showArchiveAlert = true
-                        }
-                    } label: {
-                        Text("アーカイブ")
-                    }
-                    
                     Button(role: .destructive) {
                         showSettingsSheet = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -123,18 +114,6 @@ struct ListActivityView: View {
             }
             .presentationDetents([.medium])   // 下から中サイズ
             .presentationDragIndicator(.visible)
-        }
-        
-        //==================================================//
-        //  アーカイブ確認アラート
-        //==================================================//
-        .alert("アーカイブしますか？", isPresented: $showArchiveAlert) {
-            Button("キャンセル", role: .cancel) { }
-            Button("OK") {
-                archiveCrop()
-            }
-        } message: {
-            Text("\(crop.name) をアーカイブします。")
         }
         
         //==================================================//
@@ -164,7 +143,7 @@ struct ListActivityView: View {
             Button {
                 showSettingsSheet = true
             } label: {
-                Image(systemName: "ellipsis.circle")
+                Image(systemName: "ellipsis")
                     .font(.title2)
                     .foregroundColor(.primary)
             }
@@ -176,7 +155,7 @@ struct ListActivityView: View {
     //==================================================//
     private var totalQuantityView: some View {
         let total = crop.activities.compactMap { $0.quantity }.reduce(0, +)
-        return Text("収量合計：\(total)")
+        return Text("収量合計：\(total)\(crop.unit.unitName)")
             .font(.headline)
             .foregroundColor(crop.color.cropColor)
             .opacity(0.9)
@@ -228,53 +207,56 @@ private struct ActivityRow: View {
     var onTap: (() -> Void)? = nil
     
     var body: some View {
-        HStack {
-            Text(activity.date.formattedJapaneseDate)
-            
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(crop.color.cropColor)
-                    .frame(width: 44, height: 44)
-                    .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
-                
-                Image(systemName: activity.activity.activityIcon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 22, height: 22)
-                    .foregroundColor(.white)
+        VStack {
+            HStack {
+                    Text(activity.date.formattedJapaneseDate)
+                    Spacer()
             }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(activity.activity.activityName)
-                    .font(.headline)
+            HStack {
                 
-                if let quantity = activity.quantity {
-                    Text("数量: \(quantity)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(crop.color.cropColor)
+                        .frame(width: 44, height: 44)
+                        .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
+                    
+                    Image(systemName: activity.activity.activityIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 22, height: 22)
+                        .foregroundColor(.white)
                 }
                 
-                if let comment = activity.comment, !comment.isEmpty {
-                    Text(comment)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(activity.activity.activityName)
+                        .font(.headline)
+                    
+                    if let quantity = activity.quantity {
+                        Text("数量: \(quantity)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    if let comment = activity.comment, !comment.isEmpty {
+                        Text(comment)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
                 }
+                .padding(10)
+                .background(Color.white)
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(10)
-            .background(Color.white)
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTap?()
+            .contentShape(Rectangle())
+            .onTapGesture {
+                onTap?()
+            }
         }
     }
 }
-
-
 
 //==================================================//
 //  MARK: - Preview
